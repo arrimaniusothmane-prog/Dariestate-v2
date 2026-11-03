@@ -13,6 +13,8 @@ import {
 import { useLanguage } from '../../i18n/LanguageContext';
 import { RevealOnScroll } from '../../components/animations';
 import { api } from '../../services/api';
+import { TEAM_MEMBERS } from '../../services/team';
+import { STOCK } from '../../services/imageLibrary';
 
 export const ContactPage: React.FC = () => {
   const { t } = useLanguage();
@@ -52,10 +54,9 @@ export const ContactPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
         {/* Header */}
         <RevealOnScroll direction="up">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-bronze mb-2 block">
-              {t('contact.badge')}
-            </span>
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="font-hand text-2xl sm:text-3xl text-clay-dark mb-3">On vous répond personnellement.</p>
+            <span className="section-eyebrow justify-center mb-2">{t('contact.badge')}</span>
             <h1 className="text-3xl sm:text-5xl font-serif text-charcoal mb-4">
               {t('contact.title')}
             </h1>
@@ -65,10 +66,52 @@ export const ContactPage: React.FC = () => {
           </div>
         </RevealOnScroll>
 
+        {/* Human team strip */}
+        <RevealOnScroll direction="up" delay={0.1}>
+          <div className="max-w-4xl mx-auto mb-14 bg-white rounded-luxury border border-beige/50 shadow-human p-5 sm:p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-mutedgray text-center mb-4">
+              Choisissez directement la personne qui vous accompagnera
+            </p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {TEAM_MEMBERS.map((member) => (
+                <a
+                  key={member.id}
+                  href={`mailto:${member.email}`}
+                  className="group flex flex-col items-center text-center p-2 rounded-md hover:bg-ivory-100 transition-colors"
+                >
+                  <img
+                    src={member.photo}
+                    alt={member.name}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-beige group-hover:border-clay transition-colors warm-photo"
+                    loading="lazy"
+                  />
+                  <span className="text-xs font-bold text-charcoal mt-2 leading-tight">{member.name}</span>
+                  <span className="text-[10px] text-clay font-medium mt-0.5">{member.shortRole}</span>
+                  <span className="text-[10px] text-mutedgray mt-1 hidden sm:block">{member.email}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </RevealOnScroll>
+
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Contact Details & Addresses (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
+            {/* Office photo */}
+            <div className="relative rounded-luxury overflow-hidden border border-beige/40 shadow-sm">
+              <img
+                src={STOCK.atelier[2]}
+                alt="Bureau DAR & ATELIER à Casablanca"
+                className="w-full aspect-[16/10] object-cover warm-photo"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 to-transparent" />
+              <p className="absolute bottom-4 left-4 right-4 font-hand text-2xl text-ivory leading-tight">
+                Passez nous voir, le café est prêt.
+              </p>
+            </div>
+
             {/* Casablanca Agency */}
             <div className="bg-white p-6 sm:p-8 rounded-luxury border border-beige/40 shadow-sm">
               <div className="flex items-center gap-2 mb-3">

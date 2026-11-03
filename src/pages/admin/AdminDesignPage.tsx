@@ -24,6 +24,8 @@ export const AdminDesignPage: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     category: 'LIVING_ROOM' as DesignCategory,
+    location: 'Casablanca',
+    surfaceArea: 120,
     description: '',
     materials: 'Noyer d\'Amérique, Marbre Noir Saint-Laurent, Laiton brossé, Lin naturel',
     designApproach: 'Équilibre minimaliste et chaleur organique marocaine',
@@ -61,6 +63,8 @@ export const AdminDesignPage: React.FC = () => {
     setFormData({
       title: '',
       category: 'LIVING_ROOM',
+      location: 'Casablanca',
+      surfaceArea: 120,
       description: '',
       materials: 'Noyer massif, Marbre Calacatta, Laiton brossé, Tadelakt ivoire',
       designApproach: 'Approche contemporaine alliant pureté géométrique et savoir-faire artisanal',
@@ -77,6 +81,8 @@ export const AdminDesignPage: React.FC = () => {
     setFormData({
       title: project.title,
       category: project.category,
+      location: project.location || 'Casablanca',
+      surfaceArea: project.surfaceArea || 100,
       description: project.description,
       materials: project.materials.join(', '),
       designApproach: project.designApproach,
@@ -93,6 +99,8 @@ export const AdminDesignPage: React.FC = () => {
     const payload = {
       title: formData.title,
       category: formData.category,
+      location: formData.location,
+      surfaceArea: Number(formData.surfaceArea) || undefined,
       description: formData.description,
       materials: formData.materials.split(',').map(m => m.trim()).filter(Boolean),
       designApproach: formData.designApproach,
@@ -119,6 +127,17 @@ export const AdminDesignPage: React.FC = () => {
   const handleToggleFeatured = async (project: DesignProject) => {
     await api.design.update(project.id, { isFeatured: !project.isFeatured });
     setProjects(prev => prev.map(p => p.id === project.id ? { ...p, isFeatured: !p.isFeatured } : p));
+  };
+
+  const handleDelete = async (project: DesignProject) => {
+    if (!window.confirm(`Supprimer définitivement le projet « ${project.title} » ?`)) return;
+    try {
+      await api.design.delete(project.id);
+      setProjects(prev => prev.filter(p => p.id !== project.id));
+    } catch (err) {
+      console.error(err);
+      window.alert('La suppression du projet a échoué.');
+    }
   };
 
   return (
@@ -266,6 +285,13 @@ export const AdminDesignPage: React.FC = () => {
                   >
                     <Edit3 className="w-4 h-4" />
                   </button>
+                  <button
+                    onClick={() => handleDelete(project)}
+                    className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-white rounded-sm transition-colors"
+                    title="Supprimer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -302,6 +328,18 @@ export const AdminDesignPage: React.FC = () => {
                 { value: 'OUTDOOR', label: 'Terrasse & Extérieur' },
                 { value: 'OFFICE', label: 'Bureau & Cabinet' },
               ]}
+            />
+            <Input
+              label="Localisation"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              placeholder="ex. Casablanca, Anfa"
+            />
+            <Input
+              label="Surface (m²)"
+              type="number"
+              value={formData.surfaceArea.toString()}
+              onChange={(e) => setFormData({ ...formData, surfaceArea: Number(e.target.value) })}
             />
             <Input
               label="Année de Réalisation"

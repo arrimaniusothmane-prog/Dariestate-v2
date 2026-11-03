@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useFavorites } from '../../services/favoritesContext';
-import { useAuth } from '../../services/authContext';
+import { useAuth, isStaffRole } from '../../services/authContext';
 import { Language } from '../../types';
 import { luxuryEase } from '../animations/motionVariants';
 
@@ -23,6 +23,8 @@ export const PublicHeader: React.FC = () => {
   const { favoritesCount } = useFavorites();
   const { user, isAuthenticated } = useAuth();
   const location = useLocation();
+  const isStaff = isAuthenticated && isStaffRole(user?.role);
+  const accountHref = isStaff ? '/admin/dashboard' : '/favorites';
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
@@ -67,15 +69,19 @@ export const PublicHeader: React.FC = () => {
           <div className="flex items-center gap-4 sm:gap-6">
             <span className="flex items-center gap-1.5 text-beige">
               <Compass className="w-3.5 h-3.5 text-bronze" />
-              <span>Casablanca CFC • Marrakech Guéliz • Rabat Souissi</span>
+              <span className="hidden sm:inline">Casablanca CFC • Marrakech Guéliz • Rabat Souissi</span>
+              <span className="sm:hidden">Casablanca • Marrakech</span>
             </span>
-            <span className="hidden md:inline-flex items-center gap-1 text-ivory/80">
+            <a href="tel:+212522458090" className="hidden md:inline-flex items-center gap-1 text-ivory/80 hover:text-white transition-colors">
               <Phone className="w-3 h-3 text-bronze" />
               <span>+212 5 22 45 80 90</span>
-            </span>
+            </a>
           </div>
 
           <div className="flex items-center gap-3 sm:gap-5">
+            <span className="hidden xl:inline-flex items-center gap-1.5 text-ivory/70 font-hand text-base">
+              — L’équipe vous répond sous 24 h
+            </span>
             {/* Language Switcher */}
             <div className="relative">
               <button
@@ -130,13 +136,13 @@ export const PublicHeader: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* Admin direct link */}
+            {/* Staff access */}
             <Link
-              to="/admin/dashboard"
+              to={isStaff ? '/admin/dashboard' : '/login'}
               className="hidden sm:flex items-center gap-1 text-beige hover:text-white transition-colors"
             >
               <ShieldCheck className="w-3 h-3 text-bronze" />
-              <span>{t('nav.adminDashboard')}</span>
+              <span>{isStaff ? t('nav.adminDashboard') : t('nav.login')}</span>
             </Link>
           </div>
         </div>
@@ -203,15 +209,22 @@ export const PublicHeader: React.FC = () => {
           {/* User Account / Admin */}
           {isAuthenticated ? (
             <Link
-              to="/admin/dashboard"
+              to={accountHref}
+              title={isStaff ? t('nav.adminDashboard') : t('nav.favorites')}
               className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-ivory hover:bg-beige/30 border border-beige/60 text-charcoal text-xs transition-colors"
             >
-              <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
-                alt={user?.name || 'Utilisateur'}
-                className="w-6 h-6 rounded-full object-cover"
-              />
-              <span className="font-medium truncate max-w-[100px]">{user?.name}</span>
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-clay/15 text-clay-dark flex items-center justify-center font-serif font-bold text-xs">
+                  {user?.name?.charAt(0) || 'D'}
+                </span>
+              )}
+              <span className="font-medium truncate max-w-[100px]">{user?.name?.split(' ')[0]}</span>
             </Link>
           ) : (
             <Link
@@ -281,13 +294,20 @@ export const PublicHeader: React.FC = () => {
                     </span>
                   </Link>
                   <Link
-                    to="/admin/dashboard"
+                    to={isStaff ? '/admin/dashboard' : '/login'}
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-2 text-sm text-charcoal py-1"
                   >
                     <ShieldCheck className="w-4 h-4 text-bronze" />
-                    <span>{t('nav.adminDashboard')}</span>
+                    <span>{isStaff ? t('nav.adminDashboard') : t('nav.login')}</span>
                   </Link>
+                  <a
+                    href="tel:+212522458090"
+                    className="flex items-center gap-2 text-sm text-charcoal py-1"
+                  >
+                    <Phone className="w-4 h-4 text-bronze" />
+                    <span>Parler à l’équipe — +212 5 22 45 80 90</span>
+                  </a>
                   <Link
                     to="/request-quote"
                     onClick={() => setMobileMenuOpen(false)}

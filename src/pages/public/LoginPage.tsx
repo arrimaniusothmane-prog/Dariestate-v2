@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, Mail, ShieldCheck, ArrowRight, UserCheck } from 'lucide-react';
-import { useAuth } from '../../services/authContext';
+import { useAuth, isStaffRole } from '../../services/authContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 export const LoginPage: React.FC = () => {
   const { login, switchRole } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,8 +21,14 @@ export const LoginPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await login(email, password);
-      navigate('/admin/dashboard');
+      const loggedUser = await login(email, password);
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else if (isStaffRole(loggedUser.role)) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Identifiants incorrects.');
     } finally {
@@ -30,7 +38,7 @@ export const LoginPage: React.FC = () => {
 
   const handleQuickDemoLogin = (role: any, demoEmail: string) => {
     switchRole(role);
-    navigate('/admin/dashboard');
+    navigate(redirectTo || '/admin/dashboard', { replace: true });
   };
 
   return (

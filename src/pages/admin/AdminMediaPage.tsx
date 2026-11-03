@@ -1,142 +1,138 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { 
-  Image as ImageIcon, Upload, Search, Trash2, Copy, 
-  Check, ExternalLink, Filter, Plus, FileText 
+import { api } from '../../services/api';
+import { MediaAsset } from '../../types';
+import {
+  Image as ImageIcon, Upload, Search, Trash2, Copy,
+  Check, ExternalLink, Loader2,
 } from 'lucide-react';
 
-interface MediaItem {
-  id: string;
-  url: string;
-  filename: string;
-  altText: string;
-  category: 'property' | 'construction' | 'design' | 'general';
-  dimensions: string;
-  sizeKb: number;
-  uploadedAt: string;
-}
+const CATEGORY_LABELS: Record<MediaAsset['category'], string> = {
+  property: 'Bien immobilier',
+  construction: 'Chantier',
+  design: 'Design intérieur',
+  general: 'Général',
+};
 
-const INITIAL_MEDIA: MediaItem[] = [
-  {
-    id: 'm1',
-    url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80',
-    filename: 'villa-anfa-facade-principale.jpg',
-    altText: 'Façade contemporaine Villa Anfa Supérieur Casablanca',
-    category: 'property',
-    dimensions: '1600 x 1067',
-    sizeKb: 420,
-    uploadedAt: '2025-02-14',
-  },
-  {
-    id: 'm2',
-    url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80',
-    filename: 'palmeraie-piscine-oliveraie.jpg',
-    altText: 'Piscine miroir et oliveraie Palais Palmeraie Marrakech',
-    category: 'property',
-    dimensions: '1600 x 1067',
-    sizeKb: 512,
-    uploadedAt: '2025-02-12',
-  },
-  {
-    id: 'm3',
-    url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=80',
-    filename: 'interieur-salon-marbre-noyer.jpg',
-    altText: 'Salon d\'exception avec marbre noir et boiseries en noyer',
-    category: 'design',
-    dimensions: '1600 x 1067',
-    sizeKb: 388,
-    uploadedAt: '2025-02-10',
-  },
-  {
-    id: 'm4',
-    url: 'https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=1600&q=80',
-    filename: 'chantier-gros-oeuvre-marrakech.jpg',
-    altText: 'Chantier de construction gros œuvre villa privée',
-    category: 'construction',
-    dimensions: '1600 x 1067',
-    sizeKb: 630,
-    uploadedAt: '2025-02-05',
-  },
-  {
-    id: 'm5',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80',
-    filename: 'villa-contemporaine-souissi.jpg',
-    altText: 'Villa d\'architecte avec baies vitrées toute hauteur Souissi Rabat',
-    category: 'property',
-    dimensions: '1600 x 1067',
-    sizeKb: 475,
-    uploadedAt: '2025-01-28',
-  },
-  {
-    id: 'm6',
-    url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=80',
-    filename: 'cuisine-laiton-quartz-bouskoura.jpg',
-    altText: 'Cuisine haut de gamme marbre blanc et laiton brossé',
-    category: 'design',
-    dimensions: '1600 x 1067',
-    sizeKb: 410,
-    uploadedAt: '2025-01-20',
-  },
-];
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+};
 
 export const AdminMediaPage: React.FC = () => {
   const { t } = useLanguage();
-  const [mediaList, setMediaList] = useState<MediaItem[]>(INITIAL_MEDIA);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [mediaList, setMediaList] = useState<MediaAsset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<MediaAsset | null>(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  // New Upload Form
+  // New upload form
   const [newUrl, setNewUrl] = useState('');
   const [newFilename, setNewFilename] = useState('');
   const [newAltText, setNewAltText] = useState('');
-  const [newCategory, setNewCategory] = useState<'property' | 'construction' | 'design' | 'general'>('property');
+  const [newCategory, setNewCategory] = useState<MediaAsset['category']>('property');
 
-  const filteredMedia = mediaList.filter(item => {
-    const matchesSearch = item.filename.toLowerCase().includes(search.toLowerCase()) ||
-                          item.altText.toLowerCase().includes(search.toLowerCase());
+  const loadMedia = async () => {
+    try {
+      setIsLoading(true);
+      const all = await api.media.getAll();
+      setMediaList(all);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMedia();
+  }, []);
+
+  const filteredMedia = mediaList.filter((item) => {
+    const query = search.toLowerCase();
+    const matchesSearch =
+      item.filename.toLowerCase().includes(query) ||
+      item.altText.toLowerCase().includes(query);
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
-  const handleCopyUrl = (item: MediaItem) => {
+  const handleCopyUrl = (item: MediaAsset) => {
     navigator.clipboard.writeText(item.url);
     setCopiedId(item.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Voulez-vous supprimer cette ressource multimédia ?')) {
-      setMediaList(prev => prev.filter(m => m.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Voulez-vous supprimer cette ressource multimédia ?')) return;
+    try {
+      await api.media.delete(id);
+      setMediaList((prev) => prev.filter((m) => m.id !== id));
       if (selectedItem?.id === id) setSelectedItem(null);
+    } catch (e) {
+      console.error(e);
+      window.alert('La suppression a échoué. Merci de réessayer.');
     }
   };
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUrl) return;
-
-    const newItem: MediaItem = {
-      id: 'm_' + Date.now(),
-      url: newUrl,
-      filename: newFilename || 'image-' + Date.now() + '.jpg',
-      altText: newAltText || 'Photographie architecturale DAR & ATELIER',
-      category: newCategory,
-      dimensions: '1920 x 1080',
-      sizeKb: Math.floor(Math.random() * 300 + 200),
-      uploadedAt: new Date().toISOString().split('T')[0],
-    };
-
-    setMediaList([newItem, ...mediaList]);
-    setIsUploadOpen(false);
+  const resetForm = () => {
     setNewUrl('');
     setNewFilename('');
     setNewAltText('');
+    setNewCategory('property');
+    setFormError(null);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { url, filename } = await api.media.upload(file);
+      setNewUrl(url);
+      setNewFilename(filename);
+      if (!newAltText) setNewAltText(filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' '));
+    } catch (err) {
+      console.error(err);
+      setFormError('Impossible de lire ce fichier image.');
+    }
+  };
+
+  const handleUploadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUrl) {
+      setFormError('Ajoutez une URL ou choisissez un fichier image.');
+      return;
+    }
+    setIsSaving(true);
+    setFormError(null);
+    try {
+      const newItem = await api.media.add({
+        url: newUrl,
+        filename: newFilename || `image-${Date.now()}.jpg`,
+        altText: newAltText || 'Photographie architecturale DAR & ATELIER',
+        category: newCategory,
+        dimensions: '1920 x 1080',
+        sizeKb: Math.floor(Math.random() * 300 + 200),
+      });
+      setMediaList((prev) => [newItem, ...prev]);
+      setIsUploadOpen(false);
+      resetForm();
+    } catch (err: any) {
+      setFormError(err?.message || "L'enregistrement a échoué.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -185,41 +181,54 @@ export const AdminMediaPage: React.FC = () => {
       </div>
 
       {/* Media Gallery Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {filteredMedia.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => setSelectedItem(item)}
-            className={`group bg-white rounded-sm border overflow-hidden cursor-pointer transition-all ${
-              selectedItem?.id === item.id 
-                ? 'border-bronze ring-2 ring-bronze/20 shadow-md' 
-                : 'border-stone-200 hover:border-stone-300'
-            }`}
-          >
-            <div className="relative aspect-video bg-stone-100 overflow-hidden">
-              <img 
-                src={item.url} 
-                alt={item.altText} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              <span className="absolute top-2 left-2 bg-charcoal/70 backdrop-blur-sm text-white text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm">
-                {item.category}
-              </span>
-            </div>
-            <div className="p-3">
-              <p className="text-xs font-medium text-charcoal truncate" title={item.filename}>
-                {item.filename}
-              </p>
-              <div className="flex justify-between items-center text-[11px] text-stone-400 mt-1">
-                <span>{item.dimensions}</span>
-                <span>{item.sizeKb} KB</span>
+      {isLoading ? (
+        <div className="bg-white p-12 text-center text-charcoal-light rounded-sm border border-stone-200">
+          <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-bronze" />
+          Chargement de la médiathèque...
+        </div>
+      ) : filteredMedia.length === 0 ? (
+        <div className="bg-white p-12 text-center rounded-sm border border-stone-200">
+          <ImageIcon className="w-12 h-12 mx-auto text-stone-300 mb-3" />
+          <p className="text-charcoal font-medium">Aucun visuel ne correspond à ces critères.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filteredMedia.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setSelectedItem(item)}
+              className={`group bg-white rounded-sm border overflow-hidden cursor-pointer transition-all ${
+                selectedItem?.id === item.id
+                  ? 'border-bronze ring-2 ring-bronze/20 shadow-md'
+                  : 'border-stone-200 hover:border-stone-300'
+              }`}
+            >
+              <div className="relative aspect-video bg-stone-100 overflow-hidden">
+                <img
+                  src={item.url}
+                  alt={item.altText}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <span className="absolute top-2 left-2 bg-charcoal/70 backdrop-blur-sm text-white text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                  {item.category}
+                </span>
+              </div>
+              <div className="p-3">
+                <p className="text-xs font-medium text-charcoal truncate" title={item.filename}>
+                  {item.filename}
+                </p>
+                <div className="flex justify-between items-center text-[11px] text-stone-400 mt-1">
+                  <span>{item.dimensions}</span>
+                  <span>{item.sizeKb} KB</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      {/* Inspector Drawer / Modal when an item is clicked */}
+      {/* Inspector */}
       {selectedItem && (
         <div className="bg-white p-6 rounded-sm border border-stone-200 shadow-sm flex flex-col md:flex-row gap-6 items-start">
           <div className="w-full md:w-1/3 aspect-video bg-stone-100 rounded-sm overflow-hidden border border-stone-200">
@@ -229,9 +238,9 @@ export const AdminMediaPage: React.FC = () => {
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-serif font-bold text-lg text-charcoal">{selectedItem.filename}</h3>
-                <p className="text-xs text-charcoal-light mt-0.5">Ajouté le {selectedItem.uploadedAt}</p>
+                <p className="text-xs text-charcoal-light mt-0.5">Ajouté le {formatDate(selectedItem.uploadedAt)}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setSelectedItem(null)}
                 className="text-stone-400 hover:text-stone-600 text-sm"
               >
@@ -250,7 +259,7 @@ export const AdminMediaPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-stone-400 block">Catégorie</span>
-                <span className="font-semibold text-charcoal uppercase">{selectedItem.category}</span>
+                <span className="font-semibold text-charcoal">{CATEGORY_LABELS[selectedItem.category]}</span>
               </div>
               <div>
                 <span className="text-stone-400 block">Format</span>
@@ -310,16 +319,42 @@ export const AdminMediaPage: React.FC = () => {
       {/* Upload Modal */}
       <Modal
         isOpen={isUploadOpen}
-        onClose={() => setIsUploadOpen(false)}
+        onClose={() => {
+          setIsUploadOpen(false);
+          resetForm();
+        }}
         title="Ajouter un Visuel à la Médiathèque"
       >
         <form onSubmit={handleUploadSubmit} className="space-y-4">
+          {formError && (
+            <div className="p-3 rounded bg-red-50 text-red-800 border border-red-200 text-xs">{formError}</div>
+          )}
+
+          <div className="border-2 border-dashed border-stone-200 rounded-sm p-6 text-center bg-stone-50/60">
+            <ImageIcon className="w-8 h-8 text-stone-300 mx-auto mb-2" />
+            <p className="text-xs text-charcoal-light mb-3">
+              Choisissez une image depuis votre ordinateur — elle sera enregistrée dans la médiathèque.
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+              Choisir un fichier
+            </Button>
+            {newUrl && newUrl.startsWith('data:') && (
+              <img src={newUrl} alt="Aperçu" className="mt-3 w-full max-h-32 object-cover rounded-sm border border-stone-200" />
+            )}
+          </div>
+
           <Input
-            label="URL de l'image (CDN ou hébergement externe)"
-            value={newUrl}
+            label="Ou URL de l'image (CDN ou hébergement externe)"
+            value={newUrl.startsWith('data:') ? '' : newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
             placeholder="https://images.unsplash.com/photo-..."
-            required
           />
 
           <Input
@@ -344,7 +379,7 @@ export const AdminMediaPage: React.FC = () => {
             </label>
             <select
               value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value as any)}
+              onChange={(e) => setNewCategory(e.target.value as MediaAsset['category'])}
               className="w-full border border-stone-200 rounded-sm text-sm py-2 px-3 text-charcoal focus:border-bronze focus:outline-none"
             >
               <option value="property">Biens Immobiliers</option>
@@ -355,11 +390,18 @@ export const AdminMediaPage: React.FC = () => {
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-stone-200">
-            <Button variant="outline" type="button" onClick={() => setIsUploadOpen(false)}>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                setIsUploadOpen(false);
+                resetForm();
+              }}
+            >
               Annuler
             </Button>
-            <Button type="submit">
-              Enregistrer l'image
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? 'Enregistrement...' : "Enregistrer l'image"}
             </Button>
           </div>
         </form>

@@ -9,37 +9,131 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  body {
+    background-color: #F8F4EC;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(184, 92, 66, 0.06), transparent 34%),
+      radial-gradient(circle at 88% 18%, rgba(110, 122, 95, 0.06), transparent 30%),
+      radial-gradient(circle at 50% 100%, rgba(167, 128, 88, 0.05), transparent 42%);
+    background-attachment: fixed;
+  }
+
   [dir="rtl"] {
     font-family: 'Cairo', system-ui, sans-serif;
   }
 
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   /* Custom subtle scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #F7F5F0;
+    background: #F3EDE2;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #D8C9B5;
-    border-radius: 3px;
+    background: #D6C4AC;
+    border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background: #A78058;
   }
+
+  :focus-visible {
+    outline: 2px solid #B85C42;
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* A soft paper card used for handwritten notes and human touches */
+  .paper-card {
+    background-color: #FDFAF4;
+    background-image:
+      linear-gradient(rgba(167, 128, 88, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(167, 128, 88, 0.05) 1px, transparent 1px);
+    background-size: 100% 28px, 28px 100%;
+    box-shadow: 0 18px 50px -32px rgba(42, 41, 37, 0.35);
+  }
+
+  .grain-overlay {
+    position: relative;
+  }
+  .grain-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.18;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  .warm-photo {
+    filter: saturate(0.92) contrast(1.03) sepia(0.05);
+  }
+
+  .underline-hand {
+    background-image: linear-gradient(transparent 62%, rgba(184, 92, 66, 0.28) 62%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding-bottom: 0.1em;
+  }
+
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #B85C42;
+  }
+
+  .section-eyebrow::before {
+    content: '';
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .human-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2A2925;
+    transition: color 0.25s ease;
+  }
+  .human-link:hover {
+    color: #B85C42;
+  }
+
+  .soft-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(167, 128, 88, 0.35), transparent);
+  }
 }
 
 /* Subtle image overlay hover transitions */
 .editorial-hover {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
 }
 
 .editorial-hover:hover {
-  transform: scale(1.03);
+  transform: scale(1.035);
 }
 
 /* Animations */
@@ -56,4 +150,15 @@
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

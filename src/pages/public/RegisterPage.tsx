@@ -20,7 +20,7 @@ export const RegisterPage: React.FC = () => {
     setError(null);
     try {
       await register(name, email, password, phone);
-      navigate('/admin/dashboard');
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Erreur lors de l’inscription.');
     } finally {

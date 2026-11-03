@@ -237,12 +237,24 @@ export interface Review {
   id: string;
   clientName: string;
   clientRole?: string | null;
+  avatarUrl?: string | null;
   rating: number;
   comment: string;
   projectType?: string | null;
   isVerified: boolean;
   isPublished: boolean;
   createdAt: string;
+}
+
+export interface MediaAsset {
+  id: string;
+  url: string;
+  filename: string;
+  altText: string;
+  category: 'property' | 'construction' | 'design' | 'general';
+  dimensions: string;
+  sizeKb: number;
+  uploadedAt: string;
 }
 
 export interface ActivityLog {

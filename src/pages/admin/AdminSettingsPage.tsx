@@ -2,46 +2,71 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { Language } from '../../types';
 import { api } from '../../services/api';
+import { LocalStore } from '../../services/storage';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { 
-  Settings as SettingsIcon, Save, RefreshCw, CheckCircle, 
-  Building2, Phone, Mail, Globe, MapPin, ShieldCheck, Database 
+import {
+  Save, RefreshCw, CheckCircle,
+  Building2, Phone, Mail, Globe, ShieldCheck,
 } from 'lucide-react';
+
+interface SettingsForm {
+  companyName: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  address: string;
+  city: string;
+  country: string;
+  defaultCurrency: string;
+  defaultLanguage: Language;
+  metaTitle: string;
+  metaDescription: string;
+  emailNotificationsEnabled: boolean;
+}
+
+const EMPTY_FORM: SettingsForm = {
+  companyName: 'DAR & ATELIER',
+  email: 'contact@dar-atelier.ma',
+  phone: '+212 5 22 45 80 90',
+  whatsapp: '+212 6 61 23 45 67',
+  address: 'Tour Casablanca Finance City, Boulevard d’Anfa',
+  city: 'Casablanca',
+  country: 'Maroc',
+  defaultCurrency: 'MAD',
+  defaultLanguage: 'fr',
+  metaTitle: 'DAR & ATELIER | Immobilier de prestige, villas & architecture au Maroc',
+  metaDescription:
+    'Agence immobilière haut de gamme et entreprise générale de construction à Casablanca, Marrakech, Rabat et Tanger.',
+  emailNotificationsEnabled: true,
+};
 
 export const AdminSettingsPage: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
-  const [formData, setFormData] = useState({
-    companyName: 'DAR & ATELIER',
-    tagline: 'Immobilier d\'Exception, Construction & Architecture d\'Intérieur au Maroc',
-    contactEmail: 'contact@daratelier.ma',
-    contactPhone: '+212 5 22 98 45 10',
-    whatsappNumber: '+212 6 61 23 45 67',
-    addressCasablanca: 'Boulevard Franklin Roosevelt, Triangle d\'Or, Casablanca',
-    addressMarrakech: 'Avenue Mohammed VI, Hivernage, Marrakech',
-    defaultCurrency: 'MAD',
-    defaultLanguage: 'fr' as Language,
-    seoTitle: 'DAR & ATELIER | Immobilier de Prestige, Villas & Architecture au Maroc',
-    seoDescription: 'Agence immobilière haut de gamme et entreprise générale de construction à Casablanca, Marrakech, Rabat et Tanger. Vente de villas, conception architecturale et rénovation de luxe.',
-    notificationEmail: 'leads@daratelier.ma',
-    enableEmailAlerts: true,
-  });
+  const [formData, setFormData] = useState<SettingsForm>(EMPTY_FORM);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const res = await api.settings.get();
-        if (res) {
-          setFormData(prev => ({ ...prev, ...res }));
-        }
+        setFormData({
+          companyName: res.companyName || EMPTY_FORM.companyName,
+          email: res.email || EMPTY_FORM.email,
+          phone: res.phone || EMPTY_FORM.phone,
+          whatsapp: res.whatsapp || EMPTY_FORM.whatsapp,
+          address: res.address || EMPTY_FORM.address,
+          city: res.city || EMPTY_FORM.city,
+          country: res.country || EMPTY_FORM.country,
+          defaultCurrency: res.defaultCurrency || EMPTY_FORM.defaultCurrency,
+          defaultLanguage: res.defaultLanguage || EMPTY_FORM.defaultLanguage,
+          metaTitle: res.metaTitle || EMPTY_FORM.metaTitle,
+          metaDescription: res.metaDescription || EMPTY_FORM.metaDescription,
+          emailNotificationsEnabled: res.emailNotificationsEnabled ?? true,
+        });
       } catch (err) {
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
     fetchSettings();
@@ -56,14 +81,15 @@ export const AdminSettingsPage: React.FC = () => {
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
       console.error(err);
+      window.alert("L'enregistrement des paramètres a échoué.");
     } finally {
       setSaving(false);
     }
   };
 
   const handleResetDemoData = () => {
-    if (window.confirm('Voulez-vous réinitialiser toutes les données de démonstration locales à leur état d\'origine ?')) {
-      localStorage.clear();
+    if (window.confirm('Voulez-vous réinitialiser toutes les données de démonstration locales à leur état d’origine ?')) {
+      LocalStore.resetDefaults();
       window.location.reload();
     }
   };
@@ -116,30 +142,29 @@ export const AdminSettingsPage: React.FC = () => {
               required
             />
             <Input
-              label="Devise Institutionnelle"
-              value={formData.tagline}
-              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+              label="Ville du Siège"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Adresse Siège Social (Casablanca)"
-              value={formData.addressCasablanca}
-              onChange={(e) => setFormData({ ...formData, addressCasablanca: e.target.value })}
-              required
-            />
-            <Input
-              label="Bureau Régional (Marrakech)"
-              value={formData.addressMarrakech}
-              onChange={(e) => setFormData({ ...formData, addressMarrakech: e.target.value })}
-              required
-            />
-          </div>
+          <Input
+            label="Adresse du Siège Social"
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+            required
+          />
+
+          <Input
+            label="Pays"
+            value={formData.country}
+            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+            required
+          />
         </div>
 
-        {/* Contact & Lignes Directes */}
+        {/* Contact */}
         <div className="bg-white p-6 rounded-sm border border-stone-200 shadow-sm space-y-4">
           <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
             <Phone className="w-5 h-5 text-bronze" />
@@ -150,23 +175,33 @@ export const AdminSettingsPage: React.FC = () => {
             <Input
               label="Email Général"
               type="email"
-              value={formData.contactEmail}
-              onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
             <Input
               label="Téléphone Fixe Standard"
-              value={formData.contactPhone}
-              onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               required
             />
             <Input
               label="Ligne WhatsApp Conciergerie"
-              value={formData.whatsappNumber}
-              onChange={(e) => setFormData({ ...formData, whatsappNumber: e.target.value })}
+              value={formData.whatsapp}
+              onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
               required
             />
           </div>
+
+          <label className="flex items-center gap-3 text-xs text-charcoal/80">
+            <input
+              type="checkbox"
+              checked={formData.emailNotificationsEnabled}
+              onChange={(e) => setFormData({ ...formData, emailNotificationsEnabled: e.target.checked })}
+              className="accent-bronze"
+            />
+            Recevoir une notification par email à chaque nouvelle demande client
+          </label>
         </div>
 
         {/* Localisation & Devises */}
@@ -197,7 +232,11 @@ export const AdminSettingsPage: React.FC = () => {
               </label>
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value as any)}
+                onChange={(e) => {
+                  const value = e.target.value as Language;
+                  setLanguage(value);
+                  setFormData({ ...formData, defaultLanguage: value });
+                }}
                 className="w-full border border-stone-200 rounded-sm text-sm py-2 px-3 text-charcoal focus:border-bronze focus:outline-none"
               >
                 <option value="fr">Français (FR)</option>
@@ -208,7 +247,7 @@ export const AdminSettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Référencement Naturel (SEO) */}
+        {/* SEO */}
         <div className="bg-white p-6 rounded-sm border border-stone-200 shadow-sm space-y-4">
           <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
             <ShieldCheck className="w-5 h-5 text-bronze" />
@@ -217,8 +256,8 @@ export const AdminSettingsPage: React.FC = () => {
 
           <Input
             label="Titre Global (Meta Title)"
-            value={formData.seoTitle}
-            onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })}
+            value={formData.metaTitle}
+            onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
             required
           />
 
@@ -228,15 +267,14 @@ export const AdminSettingsPage: React.FC = () => {
             </label>
             <textarea
               rows={3}
-              value={formData.seoDescription}
-              onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })}
+              value={formData.metaDescription}
+              onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
               className="w-full p-3 border border-stone-200 rounded-sm text-sm focus:border-bronze focus:outline-none"
               required
             />
           </div>
         </div>
 
-        {/* Submit */}
         <div className="flex justify-end gap-3 pt-2">
           <Button type="submit" disabled={saving} className="flex items-center gap-2">
             <Save className="w-4 h-4" />
@@ -244,6 +282,14 @@ export const AdminSettingsPage: React.FC = () => {
           </Button>
         </div>
       </form>
+
+      <div className="bg-white p-6 rounded-sm border border-stone-200 flex items-start gap-3 text-xs text-charcoal-light">
+        <Mail className="w-4 h-4 text-bronze shrink-0 mt-0.5" />
+        <p>
+          Les paramètres sont partagés avec les pages publiques (coordonnées, WhatsApp et référencement).
+          Pensez à enregistrer après chaque modification.
+        </p>
+      </div>
     </div>
   );
 };

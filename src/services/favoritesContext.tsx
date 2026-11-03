@@ -55,7 +55,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         favorites,
         toggleFavorite,
         isFavorite,
-        favoritesCount: favoriteIds.length,
+        favoritesCount: favorites.length,
       }}
     >
       {children}

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { TEAM_MEMBERS } from '../../services/team';
 import { RevealOnScroll } from '../animations';
 
 export const PublicFooter: React.FC = () => {
@@ -18,6 +19,40 @@ export const PublicFooter: React.FC = () => {
   return (
     <footer className="bg-charcoal text-ivory pt-16 pb-12 border-t border-charcoal-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
+        {/* Human team strip */}
+        <RevealOnScroll direction="up">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-10 mb-10 border-b border-charcoal-700">
+            <div className="flex items-center gap-4">
+              <div className="flex -space-x-3">
+                {TEAM_MEMBERS.map((member) => (
+                  <img
+                    key={member.id}
+                    src={member.photo}
+                    alt={member.name}
+                    title={`${member.name} — ${member.shortRole}`}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-charcoal warm-photo"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+              <div>
+                <p className="font-hand text-2xl text-beige leading-tight">L’équipe DAR &amp; ATELIER</p>
+                <p className="text-[11px] text-ivory/60 mt-0.5">
+                  Youssef, Leila, Mehdi et Karim — joignables, sans standard.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-beige hover:text-white transition-colors"
+            >
+              <span>Écrire à une vraie personne</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </RevealOnScroll>
+
         <RevealOnScroll direction="up">
           {/* Main Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-charcoal-700">
@@ -197,8 +232,8 @@ export const PublicFooter: React.FC = () => {
             <Link to="/terms" className="hover:text-ivory transition-colors">
               Conditions Générales
             </Link>
-            <Link to="/admin/dashboard" className="text-beige/80 hover:text-beige transition-colors">
-              Accès Administration
+            <Link to="/login" className="text-beige/80 hover:text-beige transition-colors">
+              Espace équipe
             </Link>
           </div>
         </div>

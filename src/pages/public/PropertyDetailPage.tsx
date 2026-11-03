@@ -24,6 +24,8 @@ import { useLanguage } from '../../i18n/LanguageContext';
 import { useFavorites } from '../../services/favoritesContext';
 import { api } from '../../services/api';
 import { Property } from '../../types';
+import { buildPropertyGallery } from '../../services/imageLibrary';
+import { TEAM_MEMBERS } from '../../services/team';
 import { PropertyCard } from '../../components/ui/PropertyCard';
 import { Modal } from '../../components/ui/Modal';
 import { Badge } from '../../components/ui/Badge';
@@ -158,9 +160,9 @@ export const PropertyDetailPage: React.FC = () => {
     }
   };
 
-  const galleryImages = property.images && property.images.length > 0 ? property.images : [
-    { id: '1', url: property.coverImage, alt: property.title, order: 0, isCover: true }
-  ];
+  const galleryImages = buildPropertyGallery(property.images || [], property.title);
+  const advisor = TEAM_MEMBERS.find((member) => member.shortRole === 'Immobilier') || TEAM_MEMBERS[0];
+  const phoneHref = `tel:${advisor.phone.replace(/\s/g, '')}`;
 
   return (
     <div className="bg-ivory-100 min-h-screen py-10 sm:py-14 animate-fade-in">
@@ -374,6 +376,25 @@ export const PropertyDetailPage: React.FC = () => {
           {/* Right Column: Sticky Contact & Private Viewing Request */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 bg-white p-6 sm:p-8 rounded-luxury border border-beige/40 shadow-luxury space-y-6">
+              {/* Human advisor */}
+              <div className="flex items-center gap-3 pb-5 border-b border-ivory-200">
+                <img
+                  src={advisor.photo}
+                  alt={advisor.name}
+                  className="w-14 h-14 rounded-full object-cover border-2 border-beige warm-photo"
+                  loading="lazy"
+                />
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-clay mb-0.5">
+                    Votre interlocuteur
+                  </p>
+                  <p className="font-serif text-base font-bold text-charcoal leading-tight">{advisor.name}</p>
+                  <a href={phoneHref} className="text-xs text-charcoal/70 hover:text-clay transition-colors flex items-center gap-1 mt-0.5">
+                    <Phone className="w-3 h-3 text-clay" /> {advisor.phone}
+                  </a>
+                </div>
+              </div>
+
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-bronze block mb-1">
                   Conseil Privé &amp; Visite
@@ -462,13 +483,13 @@ export const PropertyDetailPage: React.FC = () => {
               {/* Direct WhatsApp Callout */}
               <div className="pt-4 border-t border-ivory-200 text-center">
                 <a
-                  href={`https://wa.me/212661234567?text=Bonjour,%20je%20souhaite%20des%20informations%20sur%20la%20propriété%20"${property.title}"`}
+                  href={`https://wa.me/${advisor.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${advisor.name.split(' ')[0]}, je souhaite des informations sur « ${property.title} ».`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 hover:text-emerald-900"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-sage-dark hover:text-sage"
                 >
-                  <MessageCircle className="w-4 h-4 text-emerald-600" />
-                  <span>Discussion directe WhatsApp</span>
+                  <MessageCircle className="w-4 h-4 text-sage" />
+                  <span>WhatsApp avec {advisor.name.split(' ')[0]}</span>
                 </a>
               </div>
             </div>

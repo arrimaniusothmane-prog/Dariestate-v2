@@ -8,6 +8,7 @@ import {
   Inquiry,
   QuoteRequest,
   ActivityLog,
+  MediaAsset,
   FilterState,
 } from '../types';
 import { LocalStore } from './storage';
@@ -59,6 +60,7 @@ export const api = {
       if (user && user.isActive) {
         const fakeToken = `mock-token-${user.id}-${Date.now()}`;
         localStorage.setItem('daratelier_token', fakeToken);
+        localStorage.setItem('daratelier_user_id', user.id);
         return { token: fakeToken, user };
       }
       throw new Error('Identifiants de démonstration incorrects.');
@@ -76,6 +78,7 @@ export const api = {
           const data = await res.json();
           if (data.success) {
             localStorage.setItem('daratelier_token', data.token);
+            if (data.user?.id) localStorage.setItem('daratelier_user_id', data.user.id);
             return { token: data.token, user: data.user };
           }
         } catch (e) {
@@ -83,19 +86,16 @@ export const api = {
         }
       }
 
-      const users = LocalStore.getUsers();
-      const newUser: User = {
-        id: `u-${Date.now()}`,
+      const newUser = LocalStore.createUser({
         name,
         email,
         phone,
         role: 'CLIENT',
         isActive: true,
-        createdAt: new Date().toISOString(),
-      };
-      LocalStore.updateUser(newUser.id, newUser);
+      });
       const fakeToken = `mock-token-${newUser.id}-${Date.now()}`;
       localStorage.setItem('daratelier_token', fakeToken);
+      localStorage.setItem('daratelier_user_id', newUser.id);
       return { token: fakeToken, user: newUser };
     },
 
@@ -113,15 +113,33 @@ export const api = {
         }
       }
 
-      // Local token check
+      // Local session: a token alone is not enough, we need the stored user id.
       const token = localStorage.getItem('daratelier_token');
       if (!token) return null;
+
+      const storedUserId = localStorage.getItem('daratelier_user_id');
       const users = LocalStore.getUsers();
-      return users[0]; // Super Admin default for smooth eval
+      if (storedUserId) {
+        const sessionUser = users.find((u) => u.id === storedUserId);
+        if (sessionUser) return sessionUser;
+      }
+
+      // Backward compatibility with tokens created before the user id key existed.
+      if (token.startsWith('mock-token-')) {
+        const withoutPrefix = token.replace('mock-token-', '');
+        const matched = users.find((u) => withoutPrefix.startsWith(`${u.id}-`));
+        if (matched) {
+          localStorage.setItem('daratelier_user_id', matched.id);
+          return matched;
+        }
+      }
+
+      return null;
     },
 
     logout: async (): Promise<void> => {
       localStorage.removeItem('daratelier_token');
+      localStorage.removeItem('daratelier_user_id');
     },
   },
 
@@ -406,6 +424,14 @@ export const api = {
       return LocalStore.updateConstructionProject(id, updates);
     },
 
+    create: async (data: Partial<ConstructionProject>): Promise<ConstructionProject> => {
+      return LocalStore.createConstructionProject(data);
+    },
+
+    delete: async (id: string): Promise<void> => {
+      LocalStore.deleteConstructionProject(id);
+    },
+
     toggleMilestone: async (projectId: string, milestoneId: string): Promise<ConstructionProject> => {
       return LocalStore.toggleMilestone(projectId, milestoneId);
     },
@@ -439,6 +465,10 @@ export const api = {
     update: async (id: string, updates: Partial<DesignProject>): Promise<DesignProject> => {
       return LocalStore.updateDesignProject(id, updates);
     },
+
+    delete: async (id: string): Promise<void> => {
+      LocalStore.deleteDesignProject(id);
+    },
   },
 
   // Users
@@ -446,8 +476,14 @@ export const api = {
     getAll: async (): Promise<User[]> => {
       return LocalStore.getUsers();
     },
+    create: async (data: Partial<User>): Promise<User> => {
+      return LocalStore.createUser(data);
+    },
     update: async (id: string, updates: Partial<User>): Promise<User> => {
       return LocalStore.updateUser(id, updates);
+    },
+    delete: async (id: string): Promise<void> => {
+      LocalStore.deleteUser(id);
     },
   },
 
@@ -466,6 +502,15 @@ export const api = {
     getAll: async (): Promise<Review[]> => {
       return LocalStore.getReviews();
     },
+    create: async (data: Partial<Review>): Promise<Review> => {
+      return LocalStore.createReview(data);
+    },
+    update: async (id: string, updates: Partial<Review>): Promise<Review> => {
+      return LocalStore.updateReview(id, updates);
+    },
+    delete: async (id: string): Promise<void> => {
+      LocalStore.deleteReview(id);
+    },
   },
 
   // Activity
@@ -477,6 +522,15 @@ export const api = {
 
   // Media
   media: {
+    getAll: async (): Promise<MediaAsset[]> => {
+      return LocalStore.getMedia();
+    },
+    add: async (data: Partial<MediaAsset>): Promise<MediaAsset> => {
+      return LocalStore.addMedia(data);
+    },
+    delete: async (id: string): Promise<void> => {
+      LocalStore.deleteMedia(id);
+    },
     upload: async (file: File): Promise<{ url: string; filename: string }> => {
       // In demonstration mode, simulate instant preview url or real FormData
       return new Promise((resolve) => {

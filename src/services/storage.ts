@@ -8,7 +8,9 @@ import {
   Inquiry,
   QuoteRequest,
   ActivityLog,
+  MediaAsset,
   PropertyStatus,
+  ConstructionStatus,
 } from '../types';
 import {
   INITIAL_PROPERTIES,
@@ -20,6 +22,7 @@ import {
   INITIAL_QUOTES,
   INITIAL_SETTINGS,
   INITIAL_ACTIVITY_LOGS,
+  INITIAL_MEDIA,
 } from './mockData';
 
 const KEYS = {
@@ -32,8 +35,16 @@ const KEYS = {
   QUOTES: 'daratelier_quotes',
   SETTINGS: 'daratelier_settings',
   ACTIVITY: 'daratelier_activity',
+  MEDIA: 'daratelier_media',
   DEMO_MODE: 'daratelier_demo_mode',
+  DATA_VERSION: 'daratelier_data_version',
 };
+
+/**
+ * Bumping this value re-seeds the demo dataset once in browsers that already
+ * cached an older version (for example before the new photo galleries existed).
+ */
+const DATA_VERSION = '2026-11-human-2';
 
 // Helper for local storage
 function getStorage<T>(key: string, initial: T): T {
@@ -55,6 +66,31 @@ function setStorage<T>(key: string, data: T): void {
     localStorage.setItem(key, JSON.stringify(data));
   } catch (e) {
     console.error(`Failed to save ${key} to localStorage:`, e);
+  }
+}
+
+function seedAllDefaults(): void {
+  setStorage(KEYS.PROPERTIES, INITIAL_PROPERTIES);
+  setStorage(KEYS.CONSTRUCTION, INITIAL_CONSTRUCTION_PROJECTS);
+  setStorage(KEYS.DESIGN, INITIAL_DESIGN_PROJECTS);
+  setStorage(KEYS.REVIEWS, INITIAL_REVIEWS);
+  setStorage(KEYS.USERS, INITIAL_USERS);
+  setStorage(KEYS.INQUIRIES, INITIAL_INQUIRIES);
+  setStorage(KEYS.QUOTES, INITIAL_QUOTES);
+  setStorage(KEYS.SETTINGS, INITIAL_SETTINGS);
+  setStorage(KEYS.ACTIVITY, INITIAL_ACTIVITY_LOGS);
+  setStorage(KEYS.MEDIA, INITIAL_MEDIA);
+}
+
+function ensureDataVersion(): void {
+  try {
+    const storedVersion = localStorage.getItem(KEYS.DATA_VERSION);
+    if (storedVersion !== DATA_VERSION) {
+      seedAllDefaults();
+      localStorage.setItem(KEYS.DATA_VERSION, DATA_VERSION);
+    }
+  } catch (e) {
+    // localStorage can be unavailable in private mode / tests: the getters below still seed on demand.
   }
 }
 
@@ -274,6 +310,54 @@ export const LocalStore = {
     return getStorage<ConstructionProject[]>(KEYS.CONSTRUCTION, INITIAL_CONSTRUCTION_PROJECTS);
   },
 
+  createConstructionProject: (data: Partial<ConstructionProject>): ConstructionProject => {
+    const projects = LocalStore.getConstructionProjects();
+    const now = new Date().toISOString();
+    const id = `cp-${Date.now()}`;
+
+    const newProject: ConstructionProject = {
+      id,
+      title: data.title || 'Nouveau Chantier',
+      clientName: data.clientName || 'Client privé',
+      clientEmail: data.clientEmail || '',
+      clientPhone: data.clientPhone || '',
+      category: data.category || 'Villa Contemporaine',
+      location: data.location || 'Casablanca',
+      contractAmount: data.contractAmount || 0,
+      currency: data.currency || 'MAD',
+      startDate: data.startDate || now,
+      expectedCompletionDate: data.expectedCompletionDate || now,
+      status: (data.status as ConstructionStatus) || 'PLANNING',
+      progressPercentage: data.progressPercentage || 0,
+      projectManagerId: data.projectManagerId || 'u-3',
+      projectManagerName: data.projectManagerName || 'Ing. Mehdi Bennani',
+      coverImage: data.coverImage || INITIAL_MEDIA.find((m) => m.category === 'construction')?.url || INITIAL_MEDIA[0].url,
+      description: data.description || '',
+      milestones: (data.milestones || []).map((milestone, index) => ({
+        ...milestone,
+        id: milestone.id || `m-${Date.now()}-${index}`,
+        projectId: id,
+        order: milestone.order || index + 1,
+        isCompleted: !!milestone.isCompleted,
+      })),
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setStorage(KEYS.CONSTRUCTION, [newProject, ...projects]);
+    logActivity('CONSTRUCTION_CREATED', 'ConstructionProject', `Création du chantier "${newProject.title}" (${newProject.location})`);
+    return newProject;
+  },
+
+  deleteConstructionProject: (id: string): void => {
+    const projects = LocalStore.getConstructionProjects();
+    const target = projects.find((p) => p.id === id);
+    setStorage(KEYS.CONSTRUCTION, projects.filter((p) => p.id !== id));
+    if (target) {
+      logActivity('CONSTRUCTION_DELETED', 'ConstructionProject', `Suppression du chantier "${target.title}"`);
+    }
+  },
+
   updateConstructionProject: (id: string, updates: Partial<ConstructionProject>): ConstructionProject => {
     const projects = LocalStore.getConstructionProjects();
     const index = projects.findIndex((p) => p.id === id);
@@ -375,6 +459,15 @@ export const LocalStore = {
     return updated;
   },
 
+  deleteDesignProject: (id: string): void => {
+    const projects = LocalStore.getDesignProjects();
+    const target = projects.find((p) => p.id === id);
+    setStorage(KEYS.DESIGN, projects.filter((p) => p.id !== id));
+    if (target) {
+      logActivity('DESIGN_PROJECT_DELETED', 'DesignProject', `Suppression du projet design "${target.title}"`);
+    }
+  },
+
   // Users
   getUsers: (): User[] => {
     return getStorage<User[]>(KEYS.USERS, INITIAL_USERS);
@@ -390,6 +483,41 @@ export const LocalStore = {
     setStorage(KEYS.USERS, users);
     logActivity('USER_UPDATED', 'User', `Profil/rôle mis à jour pour ${updated.name}`);
     return updated;
+  },
+
+  createUser: (data: Partial<User>): User => {
+    const users = LocalStore.getUsers();
+    const email = (data.email || '').trim().toLowerCase();
+    if (!email) throw new Error('Une adresse email est requise.');
+    if (users.some((u) => u.email.toLowerCase() === email)) {
+      throw new Error('Un compte existe déjà avec cette adresse email.');
+    }
+
+    const newUser: User = {
+      id: `u-${Date.now()}`,
+      name: data.name || 'Nouveau collaborateur',
+      email,
+      phone: data.phone || null,
+      role: data.role || 'CLIENT',
+      avatar: data.avatar || null,
+      isActive: data.isActive !== undefined ? data.isActive : true,
+      createdAt: new Date().toISOString(),
+    };
+
+    setStorage(KEYS.USERS, [...users, newUser]);
+    logActivity('USER_CREATED', 'User', `Création du compte ${newUser.name} (${newUser.role})`);
+    return newUser;
+  },
+
+  deleteUser: (id: string): void => {
+    const users = LocalStore.getUsers();
+    const target = users.find((u) => u.id === id);
+    if (!target) return;
+    if (target.role === 'SUPER_ADMIN') {
+      throw new Error('Le compte Super Admin ne peut pas être supprimé.');
+    }
+    setStorage(KEYS.USERS, users.filter((u) => u.id !== id));
+    logActivity('USER_DELETED', 'User', `Suppression du compte ${target.name}`);
   },
 
   // Settings
@@ -410,6 +538,77 @@ export const LocalStore = {
     return getStorage<Review[]>(KEYS.REVIEWS, INITIAL_REVIEWS);
   },
 
+  createReview: (data: Partial<Review>): Review => {
+    const reviews = LocalStore.getReviews();
+    const newReview: Review = {
+      id: `rev-${Date.now()}`,
+      clientName: data.clientName || 'Client DAR & ATELIER',
+      clientRole: data.clientRole || null,
+      avatarUrl: data.avatarUrl || null,
+      rating: data.rating || 5,
+      comment: data.comment || '',
+      projectType: data.projectType || null,
+      isVerified: data.isVerified !== undefined ? data.isVerified : true,
+      isPublished: data.isPublished !== undefined ? data.isPublished : true,
+      createdAt: new Date().toISOString(),
+    };
+    setStorage(KEYS.REVIEWS, [newReview, ...reviews]);
+    logActivity('REVIEW_CREATED', 'Review', `Nouveau témoignage ajouté pour ${newReview.clientName}`);
+    return newReview;
+  },
+
+  updateReview: (id: string, updates: Partial<Review>): Review => {
+    const reviews = LocalStore.getReviews();
+    const index = reviews.findIndex((r) => r.id === id);
+    if (index === -1) throw new Error('Témoignage introuvable');
+
+    const updated: Review = { ...reviews[index], ...updates };
+    reviews[index] = updated;
+    setStorage(KEYS.REVIEWS, reviews);
+    logActivity('REVIEW_UPDATED', 'Review', `Mise à jour du témoignage de ${updated.clientName}`);
+    return updated;
+  },
+
+  deleteReview: (id: string): void => {
+    const reviews = LocalStore.getReviews();
+    const target = reviews.find((r) => r.id === id);
+    setStorage(KEYS.REVIEWS, reviews.filter((r) => r.id !== id));
+    if (target) {
+      logActivity('REVIEW_DELETED', 'Review', `Suppression du témoignage de ${target.clientName}`);
+    }
+  },
+
+  // Media library
+  getMedia: (): MediaAsset[] => {
+    return getStorage<MediaAsset[]>(KEYS.MEDIA, INITIAL_MEDIA);
+  },
+
+  addMedia: (data: Partial<MediaAsset>): MediaAsset => {
+    const media = LocalStore.getMedia();
+    const newAsset: MediaAsset = {
+      id: `media-${Date.now()}`,
+      url: data.url || '',
+      filename: data.filename || `image-${Date.now()}.jpg`,
+      altText: data.altText || 'Photographie architecturale DAR & ATELIER',
+      category: data.category || 'general',
+      dimensions: data.dimensions || '1920 x 1080',
+      sizeKb: data.sizeKb || 0,
+      uploadedAt: new Date().toISOString(),
+    };
+    setStorage(KEYS.MEDIA, [newAsset, ...media]);
+    logActivity('MEDIA_ADDED', 'MediaAsset', `Ajout du visuel "${newAsset.filename}"`);
+    return newAsset;
+  },
+
+  deleteMedia: (id: string): void => {
+    const media = LocalStore.getMedia();
+    const target = media.find((m) => m.id === id);
+    setStorage(KEYS.MEDIA, media.filter((m) => m.id !== id));
+    if (target) {
+      logActivity('MEDIA_DELETED', 'MediaAsset', `Suppression du visuel "${target.filename}"`);
+    }
+  },
+
   // Activity
   getActivityLogs: (): ActivityLog[] => {
     return getStorage<ActivityLog[]>(KEYS.ACTIVITY, INITIAL_ACTIVITY_LOGS);
@@ -417,14 +616,14 @@ export const LocalStore = {
 
   // Reset demo data
   resetDefaults: (): void => {
-    setStorage(KEYS.PROPERTIES, INITIAL_PROPERTIES);
-    setStorage(KEYS.CONSTRUCTION, INITIAL_CONSTRUCTION_PROJECTS);
-    setStorage(KEYS.DESIGN, INITIAL_DESIGN_PROJECTS);
-    setStorage(KEYS.REVIEWS, INITIAL_REVIEWS);
-    setStorage(KEYS.USERS, INITIAL_USERS);
-    setStorage(KEYS.INQUIRIES, INITIAL_INQUIRIES);
-    setStorage(KEYS.QUOTES, INITIAL_QUOTES);
-    setStorage(KEYS.SETTINGS, INITIAL_SETTINGS);
-    setStorage(KEYS.ACTIVITY, INITIAL_ACTIVITY_LOGS);
+    seedAllDefaults();
+    try {
+      localStorage.setItem(KEYS.DATA_VERSION, DATA_VERSION);
+    } catch (e) {
+      // ignore
+    }
   },
 };
+
+// Re-seed once if the stored demo dataset predates the current version.
+ensureDataVersion();

@@ -22,13 +22,13 @@ import {
   Bell,
   Globe,
 } from 'lucide-react';
-import { useAuth } from '../../services/authContext';
+import { useAuth, isStaffRole } from '../../services/authContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { UserRole } from '../../types';
 import { luxuryEase } from '../animations/motionVariants';
 
 export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, logout, switchRole } = useAuth();
+  const { user, isLoading, logout, switchRole } = useAuth();
   const { language, setLanguage, t, isRTL } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,11 +37,16 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
   const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
 
   useEffect(() => {
-    // Basic route protection
+    if (isLoading) return;
+    // Visitors must sign in, and client accounts belong on the public site.
     if (!user) {
-      navigate('/login?redirect=' + encodeURIComponent(location.pathname));
+      navigate('/login?redirect=' + encodeURIComponent(location.pathname), { replace: true });
+      return;
     }
-  }, [user, navigate, location.pathname]);
+    if (!isStaffRole(user.role)) {
+      navigate('/', { replace: true });
+    }
+  }, [user, isLoading, navigate, location.pathname]);
 
   const menuItems = [
     { href: '/admin/dashboard', label: t('admin.dashboard'), icon: LayoutDashboard },
@@ -75,6 +80,17 @@ export const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children 
     { role: 'INTERIOR_DESIGNER', label: 'Architecte d’Intérieur' },
     { role: 'SALES_REP', label: 'Chargé de Clientèle' },
   ];
+
+  if (isLoading || !user || !isStaffRole(user.role)) {
+    return (
+      <div className="min-h-screen bg-ivory-100 flex flex-col items-center justify-center gap-4 text-charcoal">
+        <div className="w-10 h-10 border-4 border-bronze border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs uppercase tracking-widest text-mutedgray">
+          {isLoading ? 'Vérification de votre session...' : 'Redirection...'}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-ivory-100 flex flex-col md:flex-row text-charcoal">

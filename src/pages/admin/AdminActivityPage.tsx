@@ -31,18 +31,28 @@ export const AdminActivityPage: React.FC = () => {
     loadLogs();
   }, []);
 
+  const getActionCategory = (action: string): string => {
+    const normalized = action.toUpperCase();
+    if (normalized.includes('DELETE') || normalized.includes('REMOVE')) return 'DELETE';
+    if (normalized.includes('CREATE') || normalized.includes('ADD') || normalized.includes('PUBLISH')) return 'CREATE';
+    if (normalized.includes('STATUS') || normalized.includes('TOGGLE') || normalized.includes('COMPLETE')) return 'STATUS_CHANGE';
+    if (normalized.includes('LOGIN') || normalized.includes('AUTH')) return 'LOGIN';
+    if (normalized.includes('UPDATE') || normalized.includes('EDIT')) return 'UPDATE';
+    return 'OTHER';
+  };
+
   const filteredLogs = logs.filter(log => {
     const actionMatch = log.action.toLowerCase().includes(search.toLowerCase());
     const entityMatch = log.entityType.toLowerCase().includes(search.toLowerCase());
     const detailsMatch = log.details ? log.details.toLowerCase().includes(search.toLowerCase()) : false;
     const userMatch = log.userName ? log.userName.toLowerCase().includes(search.toLowerCase()) : false;
     const matchesSearch = actionMatch || entityMatch || detailsMatch || userMatch;
-    const matchesAction = actionFilter === 'all' || log.action === actionFilter;
+    const matchesAction = actionFilter === 'all' || getActionCategory(log.action) === actionFilter;
     return matchesSearch && matchesAction;
   });
 
   const getActionBadge = (action: string) => {
-    switch (action) {
+    switch (getActionCategory(action)) {
       case 'CREATE':
         return <Badge variant="success">Création</Badge>;
       case 'UPDATE':

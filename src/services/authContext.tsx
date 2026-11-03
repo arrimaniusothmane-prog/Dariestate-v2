@@ -7,14 +7,28 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<User>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   hasRole: (roles: UserRole[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const ADMIN_ROLES: UserRole[] = [
+  'SUPER_ADMIN',
+  'ADMIN',
+  'AGENT',
+  'CONSTRUCTION_MANAGER',
+  'INTERIOR_DESIGNER',
+  'SALES_REP',
+];
+
+/** True when the visitor may enter the administration area. */
+export function isStaffRole(role?: UserRole | null): boolean {
+  return !!role && ADMIN_ROLES.includes(role);
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -23,17 +37,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const init = async () => {
       try {
+        // Session-based: no token / no stored user id means a visitor, not a default admin.
         const currentUser = await api.auth.getMe();
-        if (currentUser) {
-          setUser(currentUser);
-        } else {
-          // Default development evaluator user: Super Admin so evaluator can test everything right away
-          const users = LocalStore.getUsers();
-          setUser(users[0]);
-        }
+        setUser(currentUser);
       } catch (e) {
-        const users = LocalStore.getUsers();
-        setUser(users[0]);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -41,39 +49,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     init();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
       const res = await api.auth.login(email, password);
       setUser(res.user);
+      return res.user;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (name: string, email: string, password: string, phone?: string) => {
+  const register = async (name: string, email: string, password: string, phone?: string): Promise<User> => {
     setIsLoading(true);
     try {
       const res = await api.auth.register(name, email, password, phone);
       setUser(res.user);
+      return res.user;
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = () => {
-    api.auth.logout();
-    // Revert to demo client
-    const users = LocalStore.getUsers();
-    setUser(users[4] || null);
+    void api.auth.logout();
+    setUser(null);
   };
 
   const switchRole = (role: UserRole) => {
     const users = LocalStore.getUsers();
-    const target = users.find((u) => u.role === role);
+    const target = users.find((u) => u.role === role && u.isActive);
     if (target) {
       setUser(target);
-      localStorage.setItem('daratelier_token', `mock-token-${target.id}`);
+      localStorage.setItem('daratelier_token', `mock-token-${target.id}-${Date.now()}`);
+      localStorage.setItem('daratelier_user_id', target.id);
     }
   };
 

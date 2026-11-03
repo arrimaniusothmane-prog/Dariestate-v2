@@ -1,69 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
-import { 
-  Star, CheckCircle, Trash2, ShieldCheck, 
-  AlertCircle, MessageSquare, Plus, Search 
+import { api } from '../../services/api';
+import { Review } from '../../types';
+import {
+  Star, Trash2, ShieldCheck, AlertCircle, Plus, Search, Loader2,
 } from 'lucide-react';
-
-interface ReviewItem {
-  id: string;
-  authorName: string;
-  authorRole: string;
-  rating: number;
-  comment: string;
-  projectType: string;
-  isVerified: boolean;
-  isPublished: boolean;
-  isDemoNotice: boolean;
-  createdAt: string;
-}
-
-const INITIAL_REVIEWS: ReviewItem[] = [
-  {
-    id: 'r1',
-    authorName: 'M. et Mme Benjelloun',
-    authorRole: 'Propriétaires Villa Anfa Supérieur',
-    rating: 5,
-    comment: 'Une rigueur d\'exécution remarquable pour la construction de notre villa contemporaine. Le respect des délais et le niveau de finition du marbre et de l\'aluminium sont exceptionnels.',
-    projectType: 'Construction Villa Clés en Main',
-    isVerified: true,
-    isPublished: true,
-    isDemoNotice: true,
-    createdAt: '2025-01-18',
-  },
-  {
-    id: 'r2',
-    authorName: 'Dr. Tariq B.',
-    authorRole: 'Acquéreur Penthouse Marina',
-    rating: 5,
-    comment: 'Accompagnement très professionnel dans la recherche et l\'acquisition confidentielle de mon appartement de prestige. DAR & ATELIER a ensuite pris en charge l\'architecture d\'intérieur avec un goût très sûr.',
-    projectType: 'Achat Immobilier & Design',
-    isVerified: true,
-    isPublished: true,
-    isDemoNotice: true,
-    createdAt: '2025-01-25',
-  },
-  {
-    id: 'r3',
-    authorName: 'Kenza Alaoui',
-    authorRole: 'Rénovation Riad Médina Marrakech',
-    rating: 5,
-    comment: 'L\'équipe a su préserver l\'âme historique du lieu tout en intégrant une domotique moderne et un confort thermique de premier plan.',
-    projectType: 'Rénovation & Restauration',
-    isVerified: true,
-    isPublished: true,
-    isDemoNotice: true,
-    createdAt: '2025-02-02',
-  },
-];
 
 export const AdminReviewsPage: React.FC = () => {
   const { t } = useLanguage();
-  const [reviews, setReviews] = useState<ReviewItem[]>(INITIAL_REVIEWS);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterPublished, setFilterPublished] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,44 +27,62 @@ export const AdminReviewsPage: React.FC = () => {
     isVerified: true,
   });
 
-  const filteredReviews = reviews.filter(r => {
-    const matchesSearch = r.authorName.toLowerCase().includes(search.toLowerCase()) ||
-                          r.comment.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filterPublished === 'all' || 
-                          (filterPublished === 'published' && r.isPublished) ||
-                          (filterPublished === 'unpublished' && !r.isPublished);
-    return matchesSearch && matchesFilter;
-  });
-
-  const handleTogglePublish = (id: string) => {
-    setReviews(prev => prev.map(r => r.id === id ? { ...r, isPublished: !r.isPublished } : r));
-  };
-
-  const handleToggleVerified = (id: string) => {
-    setReviews(prev => prev.map(r => r.id === id ? { ...r, isVerified: !r.isVerified } : r));
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Voulez-vous supprimer ce témoignage ?')) {
-      setReviews(prev => prev.filter(r => r.id !== id));
+  const loadReviews = async () => {
+    try {
+      setIsLoading(true);
+      const all = await api.reviews.getAll();
+      setReviews(all);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleCreate = (e: React.FormEvent) => {
+  useEffect(() => {
+    loadReviews();
+  }, []);
+
+  const filteredReviews = reviews.filter((r) => {
+    const matchesSearch =
+      r.clientName.toLowerCase().includes(search.toLowerCase()) ||
+      r.comment.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter =
+      filterPublished === 'all' ||
+      (filterPublished === 'published' && r.isPublished) ||
+      (filterPublished === 'unpublished' && !r.isPublished);
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleTogglePublish = async (review: Review) => {
+    const updated = await api.reviews.update(review.id, { isPublished: !review.isPublished });
+    setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+  };
+
+  const handleToggleVerified = async (review: Review) => {
+    const updated = await api.reviews.update(review.id, { isVerified: !review.isVerified });
+    setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Voulez-vous supprimer ce témoignage ?')) {
+      await api.reviews.delete(id);
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newRev: ReviewItem = {
-      id: 'r_' + Date.now(),
-      authorName: formData.authorName,
-      authorRole: formData.authorRole,
+    const created = await api.reviews.create({
+      clientName: formData.authorName,
+      clientRole: formData.authorRole,
       rating: formData.rating,
       comment: formData.comment,
       projectType: formData.projectType,
       isVerified: formData.isVerified,
       isPublished: true,
-      isDemoNotice: true,
-      createdAt: new Date().toISOString().split('T')[0],
-    };
-    setReviews([newRev, ...reviews]);
+    });
+    setReviews((prev) => [created, ...prev]);
     setIsModalOpen(false);
     setFormData({ authorName: '', authorRole: '', rating: 5, comment: '', projectType: 'Construction Villa', isVerified: true });
   };
@@ -142,7 +109,7 @@ export const AdminReviewsPage: React.FC = () => {
       <div className="bg-amber-50 border border-amber-200 p-4 rounded-sm flex items-start gap-3">
         <AlertCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
         <div className="text-xs text-amber-900 leading-relaxed">
-          <strong>Règle Déontologique & Conformité :</strong> Les avis ci-dessous sont clairement étiquetés comme démonstrations de projets récents. 
+          <strong>Règle Déontologique & Conformité :</strong> Les avis publiés ici apparaissent immédiatement sur la page d'accueil.
           Ne jamais publier d'avis anonyme non certifié sans accord préalable du maître d'ouvrage.
         </div>
       </div>
@@ -173,77 +140,95 @@ export const AdminReviewsPage: React.FC = () => {
       </div>
 
       {/* Reviews List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredReviews.map((rev) => (
-          <div 
-            key={rev.id}
-            className="bg-white p-5 rounded-sm border border-stone-200 shadow-sm flex flex-col justify-between hover:border-bronze/40 transition-all"
-          >
-            <div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-serif font-bold text-base text-charcoal">{rev.authorName}</h3>
-                  <p className="text-xs text-charcoal-light">{rev.authorRole}</p>
-                </div>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-bronze text-bronze' : 'text-stone-300'}`} 
+      {isLoading ? (
+        <div className="bg-white p-12 text-center rounded-sm border border-stone-200 text-charcoal-light">
+          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-bronze" />
+          Chargement des témoignages...
+        </div>
+      ) : filteredReviews.length === 0 ? (
+        <div className="bg-white p-12 text-center rounded-sm border border-stone-200 text-charcoal-light">
+          Aucun témoignage ne correspond à ces critères.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredReviews.map((rev) => (
+            <div
+              key={rev.id}
+              className="bg-white p-5 rounded-sm border border-stone-200 shadow-sm flex flex-col justify-between hover:border-bronze/40 transition-all"
+            >
+              <div>
+                <div className="flex justify-between items-start gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={rev.avatarUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80'}
+                      alt={rev.clientName}
+                      className="w-10 h-10 rounded-full object-cover border border-beige/60 flex-shrink-0"
                     />
-                  ))}
+                    <div className="min-w-0">
+                      <h3 className="font-serif font-bold text-base text-charcoal truncate">{rev.clientName}</h3>
+                      <p className="text-xs text-charcoal-light truncate">{rev.clientRole}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5 flex-shrink-0">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-bronze text-bronze' : 'text-stone-300'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-xs text-stone-600 italic mt-3 bg-stone-50 p-3 rounded-sm border border-stone-100 leading-relaxed">
+                  "{rev.comment}"
+                </p>
+
+                <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+                  <span className="bg-stone-100 text-charcoal px-2 py-0.5 rounded-sm">
+                    {rev.projectType}
+                  </span>
+                  {rev.isVerified ? (
+                    <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-sm flex items-center gap-1 font-medium">
+                      <ShieldCheck className="w-3 h-3" /> Maître d'Ouvrage Vérifié
+                    </span>
+                  ) : (
+                    <span className="bg-stone-100 text-stone-500 px-2 py-0.5 rounded-sm">
+                      Non Vérifié
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <p className="text-xs text-stone-600 italic mt-3 bg-stone-50 p-3 rounded-sm border border-stone-100 leading-relaxed">
-                "{rev.comment}"
-              </p>
-
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                <span className="bg-stone-100 text-charcoal px-2 py-0.5 rounded-sm">
-                  {rev.projectType}
-                </span>
-                {rev.isVerified ? (
-                  <span className="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-sm flex items-center gap-1 font-medium">
-                    <ShieldCheck className="w-3 h-3" /> Maître d'Ouvrage Vérifié
-                  </span>
-                ) : (
-                  <span className="bg-stone-100 text-stone-500 px-2 py-0.5 rounded-sm">
-                    Non Vérifié
-                  </span>
-                )}
+              <div className="mt-5 pt-3 border-t border-stone-100 flex justify-between items-center text-xs">
+                <button
+                  onClick={() => handleTogglePublish(rev)}
+                  className={`font-medium transition-colors ${
+                    rev.isPublished ? 'text-emerald-700 hover:text-emerald-800' : 'text-stone-400 hover:text-stone-600'
+                  }`}
+                >
+                  {rev.isPublished ? '● En Ligne (Visible)' : '○ Masqué'}
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggleVerified(rev)}
+                    className="text-stone-400 hover:text-bronze p-1"
+                    title="Basculer vérification"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(rev.id)}
+                    className="text-stone-400 hover:text-red-600 p-1"
+                    title="Supprimer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div className="mt-5 pt-3 border-t border-stone-100 flex justify-between items-center text-xs">
-              <button
-                onClick={() => handleTogglePublish(rev.id)}
-                className={`font-medium transition-colors ${
-                  rev.isPublished ? 'text-emerald-700 hover:text-emerald-800' : 'text-stone-400 hover:text-stone-600'
-                }`}
-              >
-                {rev.isPublished ? '● En Ligne (Visible)' : '○ Masqué'}
-              </button>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleToggleVerified(rev.id)}
-                  className="text-stone-400 hover:text-bronze p-1"
-                  title="Basculer vérification"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(rev.id)}
-                  className="text-stone-400 hover:text-red-600 p-1"
-                  title="Supprimer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal Add Review */}
       <Modal

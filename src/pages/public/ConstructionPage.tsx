@@ -18,6 +18,7 @@ import {
 import { useLanguage } from '../../i18n/LanguageContext';
 import { RevealOnScroll, StaggerContainer, StaggerItem } from '../../components/animations';
 import { api } from '../../services/api';
+import { STOCK } from '../../services/imageLibrary';
 
 export const ConstructionPage: React.FC = () => {
   const { t, formatPrice } = useLanguage();
@@ -102,9 +103,9 @@ export const ConstructionPage: React.FC = () => {
             initial={{ scale: 1.08 }}
             animate={{ scale: 1 }}
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-            src="https://images.unsplash.com/photo-1541888946425-d0fbb1861564?auto=format&fit=crop&w=2000&q=85"
+            src={STOCK.construction[0]}
             alt="Chantier de villa contemporaine au Maroc"
-            className="w-full h-full object-cover opacity-30"
+            className="w-full h-full object-cover opacity-30 warm-photo"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/70 to-charcoal/40" />
         </div>

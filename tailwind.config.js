@@ -9,23 +9,23 @@ export default {
     extend: {
       colors: {
         ivory: {
-          DEFAULT: '#F7F5F0',
-          50: '#FDFCFB',
-          100: '#F7F5F0',
-          200: '#EFECE3',
-          300: '#E4DFD2',
+          DEFAULT: '#F8F4EC',
+          50: '#FDFAF5',
+          100: '#F8F4EC',
+          200: '#F0E9DC',
+          300: '#E5DAC8',
         },
         charcoal: {
-          DEFAULT: '#20211F',
-          900: '#141514',
-          800: '#20211F',
-          700: '#2E2F2C',
-          600: '#42433F',
+          DEFAULT: '#2A2925',
+          900: '#1C1C19',
+          800: '#2A2925',
+          700: '#393832',
+          600: '#4C4B44',
         },
         beige: {
-          DEFAULT: '#D8C9B5',
-          light: '#EBE3D7',
-          dark: '#BFAA93',
+          DEFAULT: '#DCCDB8',
+          light: '#EFE6D8',
+          dark: '#C4B097',
         },
         bronze: {
           DEFAULT: '#A78058',
@@ -34,10 +34,29 @@ export default {
           50: '#F9F6F0',
           100: '#F1E9DE',
         },
+        clay: {
+          DEFAULT: '#B85C42',
+          light: '#D07A5F',
+          dark: '#96452F',
+          50: '#FBF1ED',
+          100: '#F5DDD4',
+        },
+        sage: {
+          DEFAULT: '#6E7A5F',
+          light: '#8A9679',
+          dark: '#55614A',
+          50: '#F2F4EE',
+          100: '#E3E8DB',
+        },
+        sand: {
+          DEFAULT: '#EADFCB',
+          light: '#F4EDE1',
+          dark: '#D9C9AD',
+        },
         mutedgray: {
-          DEFAULT: '#777872',
-          light: '#A1A29D',
-          dark: '#585954',
+          DEFAULT: '#77766E',
+          light: '#A3A198',
+          dark: '#5B5A53',
         },
         status: {
           green: '#2E7D32',
@@ -47,18 +66,36 @@ export default {
         }
       },
       fontFamily: {
-        serif: ['"DM Serif Display"', 'Georgia', 'serif'],
+        serif: ['Fraunces', '"DM Serif Display"', 'Georgia', 'serif'],
         sans: ['Manrope', 'system-ui', 'sans-serif'],
+        hand: ['Caveat', 'Georgia', 'cursive'],
         arabic: ['Cairo', 'Manrope', 'sans-serif'],
       },
       boxShadow: {
-        'luxury': '0 20px 40px -15px rgba(32, 33, 31, 0.07)',
-        'luxury-hover': '0 30px 60px -12px rgba(32, 33, 31, 0.12)',
-        'elevated': '0 10px 30px -5px rgba(32, 33, 31, 0.05)',
+        'luxury': '0 22px 50px -24px rgba(42, 41, 37, 0.20)',
+        'luxury-hover': '0 30px 60px -20px rgba(42, 41, 37, 0.26)',
+        'elevated': '0 10px 30px -5px rgba(42, 41, 37, 0.06)',
+        'soft': '0 16px 40px -24px rgba(42, 41, 37, 0.18)',
+        'human': '0 2px 0 0 rgba(42, 41, 37, 0.06), 0 18px 40px -24px rgba(42, 41, 37, 0.22)',
       },
       borderRadius: {
-        'luxury': '0.75rem',
-      }
+        'luxury': '1rem',
+        'arch': '10rem 10rem 0.75rem 0.75rem',
+      },
+      animation: {
+        'float-slow': 'floatSlow 7s ease-in-out infinite',
+        'fade-up': 'fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+      },
+      keyframes: {
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        fadeUp: {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [],

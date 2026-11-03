@@ -25,6 +25,7 @@ export const DesignPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('ALL');
   const [projects, setProjects] = useState<DesignProject[]>([]);
   const [selectedProject, setSelectedProject] = useState<DesignProject | null>(null);
+  const [activeImage, setActiveImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export const DesignPage: React.FC = () => {
     { key: 'BEDROOM', label: t('design.categoryBedroom') },
     { key: 'BATHROOM', label: t('design.categoryBathroom') },
     { key: 'OUTDOOR', label: t('design.categoryOutdoor') },
+    { key: 'OFFICE', label: 'Bureaux' },
   ];
 
   return (
@@ -105,7 +107,10 @@ export const DesignPage: React.FC = () => {
                 <motion.div
                   whileHover={{ y: -5 }}
                   transition={{ duration: 0.3 }}
-                  onClick={() => setSelectedProject(proj)}
+                  onClick={() => {
+                    setSelectedProject(proj);
+                    setActiveImage(proj.coverImage);
+                  }}
                   className="group relative bg-white rounded-luxury overflow-hidden border border-beige/40 shadow-sm hover:shadow-luxury transition-all duration-500 cursor-pointer h-full flex flex-col justify-between"
                 >
                   {/* Image */}
@@ -153,7 +158,10 @@ export const DesignPage: React.FC = () => {
         {selectedProject && (
           <Modal
             isOpen={!!selectedProject}
-            onClose={() => setSelectedProject(null)}
+            onClose={() => {
+              setSelectedProject(null);
+              setActiveImage(null);
+            }}
             title={selectedProject.title}
             subtitle={`${selectedProject.location || 'Maroc'} • Réalisation ${selectedProject.year}`}
             maxWidth="4xl"
@@ -162,11 +170,31 @@ export const DesignPage: React.FC = () => {
               {/* Main Image */}
               <div className="aspect-[16/9] rounded-lg overflow-hidden bg-ivory-200 shadow-md">
                 <img
-                  src={selectedProject.coverImage}
+                  src={activeImage || selectedProject.coverImage}
                   alt={selectedProject.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-opacity duration-300"
                 />
               </div>
+
+              {/* Gallery thumbnails */}
+              {selectedProject.galleryImages && selectedProject.galleryImages.length > 1 && (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5">
+                  {Array.from(new Set([selectedProject.coverImage, ...selectedProject.galleryImages])).map((image) => (
+                    <button
+                      key={image}
+                      type="button"
+                      onClick={() => setActiveImage(image)}
+                      className={`aspect-[4/3] rounded overflow-hidden border-2 transition-all cursor-pointer ${
+                        (activeImage || selectedProject.coverImage) === image
+                          ? 'border-bronze shadow-sm'
+                          : 'border-transparent opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={image} alt={selectedProject.title} className="w-full h-full object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Description & Approach */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

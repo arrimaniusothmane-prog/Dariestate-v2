@@ -7,10 +7,16 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
+import { STOCK } from '../../services/imageLibrary';
 import { 
-  HardHat, Plus, Search, Calendar, MapPin, CheckCircle2, 
-  Clock, DollarSign, Edit3, Trash2, ChevronRight, Layers
+  HardHat, Plus, Search, MapPin, CheckCircle2, Trash2
 } from 'lucide-react';
+
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value || '—';
+  return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+};
 
 export const AdminConstructionPage: React.FC = () => {
   const { t, formatPrice } = useLanguage();
@@ -34,9 +40,9 @@ export const AdminConstructionPage: React.FC = () => {
     expectedCompletionDate: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
     status: 'STRUCTURE' as ConstructionStatus,
     progressPercentage: 35,
-    projectManagerName: 'Mehdi Benkiran',
+    projectManagerName: 'Mehdi Bennani',
     description: '',
-    coverImage: 'https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=1200&q=80',
+    coverImage: STOCK.construction[0],
   });
 
   const loadProjects = async () => {
@@ -63,23 +69,66 @@ export const AdminConstructionPage: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      clientName: '',
+      clientEmail: '',
+      clientPhone: '',
+      category: 'VILLA CONTEMPORAINE',
+      location: '',
+      contractAmount: 4500000,
+      startDate: new Date().toISOString().split('T')[0],
+      expectedCompletionDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: 'STRUCTURE',
+      progressPercentage: 35,
+      projectManagerName: 'Mehdi Bennani',
+      description: '',
+      coverImage: STOCK.construction[0],
+    });
+  };
+
+  const addMonths = (isoDate: string, months: number) => {
+    const base = new Date(isoDate);
+    if (Number.isNaN(base.getTime())) return new Date().toISOString().split('T')[0];
+    base.setMonth(base.getMonth() + months);
+    return base.toISOString().split('T')[0];
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const newProj = await api.construction.update('new_' + Date.now(), {
+      await api.construction.create({
         ...formData,
         currency: 'MAD',
+        description:
+          formData.description ||
+          `Chantier ${formData.category.toLowerCase()} conduit par DAR & ATELIER à ${formData.location}.`,
         milestones: [
-          { id: 'm1', projectId: 'temp', title: 'Terrassement & Fondations Spéciales', targetDate: '2025-04-15', isCompleted: true, order: 1 },
-          { id: 'm2', projectId: 'temp', title: 'Gros Œuvre & Béton Armé', targetDate: '2025-08-30', isCompleted: false, order: 2 },
-          { id: 'm3', projectId: 'temp', title: 'Étanchéité & Menuiserie Aluminium', targetDate: '2025-11-15', isCompleted: false, order: 3 },
-          { id: 'm4', projectId: 'temp', title: 'Revêtements Marbre & Finitions', targetDate: '2026-02-28', isCompleted: false, order: 4 },
-        ]
+          { id: 'm1', projectId: '', title: 'Terrassement & Fondations Spéciales', targetDate: addMonths(formData.startDate, 2), isCompleted: true, order: 1 },
+          { id: 'm2', projectId: '', title: 'Gros Œuvre & Béton Armé', targetDate: addMonths(formData.startDate, 6), isCompleted: false, order: 2 },
+          { id: 'm3', projectId: '', title: 'Étanchéité & Menuiserie Aluminium', targetDate: addMonths(formData.startDate, 9), isCompleted: false, order: 3 },
+          { id: 'm4', projectId: '', title: 'Revêtements Marbre & Finitions', targetDate: addMonths(formData.startDate, 12), isCompleted: false, order: 4 },
+        ],
       });
       setIsModalOpen(false);
-      loadProjects();
+      resetForm();
+      await loadProjects();
     } catch (err) {
       console.error(err);
+      window.alert("La création du chantier a échoué. Merci de réessayer.");
+    }
+  };
+
+  const handleDelete = async (project: ConstructionProject) => {
+    if (!window.confirm(`Supprimer définitivement le chantier « ${project.title} » ?`)) return;
+    try {
+      await api.construction.delete(project.id);
+      setProjects((prev) => prev.filter((p) => p.id !== project.id));
+      if (selectedProject?.id === project.id) setSelectedProject(null);
+    } catch (err) {
+      console.error(err);
+      window.alert('La suppression a échoué.');
     }
   };
 
@@ -202,8 +251,9 @@ export const AdminConstructionPage: React.FC = () => {
               <div>
                 <div className="relative h-48 w-full overflow-hidden bg-stone-100">
                   <img 
-                    src={project.coverImage || 'https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80'} 
+                    src={project.coverImage || STOCK.construction[0]} 
                     alt={project.title} 
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3 flex gap-2">
@@ -250,11 +300,11 @@ export const AdminConstructionPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3 mt-4 text-xs text-charcoal-light border-t border-b border-stone-100 py-3">
                     <div>
                       <span className="block text-stone-400">Chef de Projet:</span>
-                      <span className="font-semibold text-charcoal">{project.projectManagerName || 'Mehdi Benkiran'}</span>
+                      <span className="font-semibold text-charcoal">{project.projectManagerName || 'Mehdi Bennani'}</span>
                     </div>
                     <div>
                       <span className="block text-stone-400">Livraison Prévue:</span>
-                      <span className="font-semibold text-charcoal">{project.expectedCompletionDate}</span>
+                      <span className="font-semibold text-charcoal">{formatDate(project.expectedCompletionDate)}</span>
                     </div>
                   </div>
 
@@ -277,7 +327,7 @@ export const AdminConstructionPage: React.FC = () => {
                             {m.title}
                           </span>
                         </div>
-                        <span className="text-[10px] text-stone-400">{m.targetDate}</span>
+                        <span className="text-[10px] text-stone-400">{formatDate(m.targetDate)}</span>
                       </div>
                     ))}
                   </div>
@@ -287,7 +337,16 @@ export const AdminConstructionPage: React.FC = () => {
               {/* Bottom Actions */}
               <div className="p-4 bg-stone-50 border-t border-stone-200 flex justify-between items-center text-xs">
                 <span className="text-stone-400">Réf Chantier: {project.id}</span>
-                <span className="text-stone-500 font-medium">DAR & ATELIER Construction</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-stone-500 font-medium">DAR &amp; ATELIER Construction</span>
+                  <button
+                    onClick={() => handleDelete(project)}
+                    className="p-1.5 text-stone-400 hover:text-red-600 rounded-sm transition-colors"
+                    title="Supprimer ce chantier"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
