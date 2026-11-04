@@ -18,6 +18,24 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode =
   const favorite = isFavorite(property.id);
 
   const isList = viewMode === 'list';
+  const typeLabels: Record<string, string> = {
+    VILLA: 'Villa',
+    APARTMENT: 'Appartement',
+    HOUSE: 'Maison',
+    LAND: 'Terrain',
+    DUPLEX: 'Duplex',
+    PENTHOUSE: 'Penthouse',
+    COMMERCIAL: 'Local commercial',
+    OFFICE: 'Bureau',
+  };
+  const statusLabels: Record<string, string> = {
+    UNDER_OFFER: 'Offre en cours',
+    RESERVED: 'Réservé',
+    SOLD: 'Vendu',
+    RENTED: 'Loué',
+  };
+  const statusLabel = statusLabels[property.status] || '';
+  const isUnavailable = property.status === 'SOLD' || property.status === 'RENTED';
 
   return (
     <motion.div
@@ -36,7 +54,9 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode =
         <img
           src={property.coverImage}
           alt={property.title}
-          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${
+            isUnavailable ? 'grayscale-[35%] opacity-90' : ''
+          }`}
           loading="lazy"
         />
 
@@ -51,6 +71,11 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode =
           {property.isFeatured && (
             <Badge variant="bronze" size="sm">
               {t('property.featured')}
+            </Badge>
+          )}
+          {statusLabel && (
+            <Badge variant={isUnavailable ? 'danger' : 'warning'} size="sm">
+              {statusLabel}
             </Badge>
           )}
         </div>
@@ -139,7 +164,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode =
         {/* Footer actions */}
         <div className="pt-2 flex items-center justify-between">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-mutedgray">
-            {property.type}
+            {typeLabels[property.type] || property.type}
           </span>
           <Link
             to={`/properties/${property.slug}`}

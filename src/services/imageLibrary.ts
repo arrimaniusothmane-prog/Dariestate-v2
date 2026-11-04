@@ -115,8 +115,11 @@ export function buildPropertyGallery(images: { id: string; url: string; alt?: st
     ...STOCK.outdoors,
   ];
 
+  // Only use a fallback when the property genuinely has no photo. We never
+  // pad real listings with unrelated stock imagery: the admin's photos are
+  // the property's photos.
   let fallbackIndex = 0;
-  while (gallery.length < 5 && fallbackIndex < fallbacks.length) {
+  while (gallery.length === 0 && fallbackIndex < fallbacks.length) {
     const url = fallbacks[fallbackIndex++];
     if (!seen.has(url)) {
       seen.add(url);

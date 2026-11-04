@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createQuoteRequest, getQuoteRequests, updateQuoteRequest } from './quotes.controller.js';
 import { authenticate, requireRoles } from '../../middleware/auth.js';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../../types/enums.js';
 
 const router = Router();
 

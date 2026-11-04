@@ -1,15 +1,18 @@
 import { Router } from 'express';
-import { getUsers, createUser, updateUser } from './users.controller.js';
+import { getUsers, createUser, updateUser, updateMyProfile, changeMyPassword, deleteMyAccount } from './users.controller.js';
 import { authenticate, requireRoles } from '../../middleware/auth.js';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../../types/enums.js';
 
 const router = Router();
 
-router.use(authenticate);
-router.use(requireRoles([UserRole.SUPER_ADMIN, UserRole.ADMIN]));
+// Admin-only routes
+router.get('/', authenticate, requireRoles([UserRole.SUPER_ADMIN, UserRole.ADMIN]), getUsers);
+router.post('/', authenticate, requireRoles([UserRole.SUPER_ADMIN, UserRole.ADMIN]), createUser);
+router.patch('/:id', authenticate, requireRoles([UserRole.SUPER_ADMIN, UserRole.ADMIN]), updateUser);
 
-router.get('/', getUsers);
-router.post('/', createUser);
-router.patch('/:id', updateUser);
+// User self-management routes (authenticated users can manage their own profile)
+router.patch('/me/profile', authenticate, updateMyProfile);
+router.post('/me/change-password', authenticate, changeMyPassword);
+router.delete('/me', authenticate, deleteMyAccount);
 
 export default router;

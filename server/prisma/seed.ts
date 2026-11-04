@@ -1,7 +1,21 @@
-import { PrismaClient, UserRole, PropertyType, TransactionType, PropertyStatus, InquiryStatus, Priority, QuoteStatus, ConstructionStatus, DesignCategory } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { UserRole, PropertyType, TransactionType, PropertyStatus, InquiryStatus, Priority, QuoteStatus, ConstructionStatus, DesignCategory } from '../src/types/enums.js';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
+
+// Prisma's SQLite connector does not support scalar lists or Json fields.
+// The API therefore stores array fields as JSON strings and parses them on read.
+function serializeStringArray(values: string[]): string {
+  return JSON.stringify(values);
+}
+
+let referenceSequence = 0;
+
+function propertyReference(prefix: string): string {
+  referenceSequence += 1;
+  return `DAR-${prefix}-${new Date().getFullYear()}-${String(referenceSequence).padStart(4, '0')}`;
+}
 
 async function main() {
   console.log('Seeding DAR & ATELIER database...');
@@ -36,6 +50,7 @@ async function main() {
       name: 'Youssef El Amrani',
       phone: '+212 6 61 00 11 22',
       role: UserRole.SUPER_ADMIN,
+      isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     },
   });
@@ -47,6 +62,7 @@ async function main() {
       name: 'Karim Alami',
       phone: '+212 6 62 33 44 55',
       role: UserRole.AGENT,
+      isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     },
   });
@@ -58,6 +74,7 @@ async function main() {
       name: 'Ing. Mehdi Bennani',
       phone: '+212 6 63 55 66 77',
       role: UserRole.CONSTRUCTION_MANAGER,
+      isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
     },
   });
@@ -69,6 +86,7 @@ async function main() {
       name: 'Architecte Leila Tazi',
       phone: '+212 6 64 77 88 99',
       role: UserRole.INTERIOR_DESIGNER,
+      isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
     },
   });
@@ -80,6 +98,7 @@ async function main() {
       name: 'Dr. Omar Kabbaj',
       phone: '+212 6 61 88 99 00',
       role: UserRole.CLIENT,
+      isEmailVerified: true,
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
     },
   });
@@ -91,6 +110,7 @@ async function main() {
     data: {
       title: 'Villa Al Manara — Panorama Océan & Architecture Minimaliste',
       slug: 'villa-al-manara-anfa-superieur-casablanca',
+      reference: propertyReference('V'),
       description: 'Chef-d’œuvre d’architecture contemporaine érigé sur les hauteurs d’Anfa Supérieur. Volumes magistraux baignés de lumière naturelle, finitions en marbre d’Oued Ykem et noyer massif. Piscine à débordement suspendue vers l’Atlantique, domotique intégrale Lutron, et suite de maître d’exception.',
       type: PropertyType.VILLA,
       transactionType: TransactionType.BUY,
@@ -103,6 +123,7 @@ async function main() {
       bedrooms: 5,
       bathrooms: 6,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: true,
       coverImage: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'A+',
@@ -135,6 +156,7 @@ async function main() {
     data: {
       title: 'Palais des Oliviers — Quintessence Orientale & Confort Moderne',
       slug: 'palais-des-oliviers-palmeraie-marrakech',
+      reference: propertyReference('V'),
       description: 'Somptueuse propriété nichée au cœur d’un hectare d’oliviers centenaires dans la prestigieuse Palmeraie de Marrakech. Alliance subtile du savoir-faire artisanal marocain (zelliges géométriques ciselés main, plafonds de cèdre) et des équipements les plus modernes.',
       type: PropertyType.VILLA,
       transactionType: TransactionType.BUY,
@@ -147,6 +169,7 @@ async function main() {
       bedrooms: 7,
       bathrooms: 8,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: true,
       coverImage: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'A',
@@ -175,6 +198,7 @@ async function main() {
     data: {
       title: 'Penthouse L’Horizon — Vue 360° sur la Marina & l’Océan',
       slug: 'penthouse-lhorizon-marina-casablanca',
+      reference: propertyReference('P'),
       description: 'Perché au dernier étage d’une tour emblématique de la Marina de Casablanca, ce penthouse d’exception offre des panoramas époustouflants sur la grande mosquée Hassan II et le grand large. Terrasses paysagées de 120m² avec jacuzzi extérieur.',
       type: PropertyType.PENTHOUSE,
       transactionType: TransactionType.BUY,
@@ -187,6 +211,7 @@ async function main() {
       bedrooms: 3,
       bathrooms: 4,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: true,
       coverImage: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'A',
@@ -213,6 +238,7 @@ async function main() {
     data: {
       title: 'Villa Serenity — Lignes Épurées & Jardin d’Eden à Souissi',
       slug: 'villa-serenity-souissi-rabat',
+      reference: propertyReference('V'),
       description: 'Dans le quartier diplomatique le plus recherché de la capitale, cette villa de plain-pied et R+1 combine intimité absolue et architecture bioclimatique. Grands vitrages sans montants, piscine chauffée en pierre de Bali.',
       type: PropertyType.VILLA,
       transactionType: TransactionType.BUY,
@@ -225,6 +251,7 @@ async function main() {
       bedrooms: 5,
       bathrooms: 5,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: false,
       coverImage: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'A+',
@@ -249,6 +276,7 @@ async function main() {
     data: {
       title: 'Résidence Bel-Air — Appartement de Prestige en Front de Mer',
       slug: 'residence-bel-air-malabata-tanger',
+      reference: propertyReference('A'),
       description: 'À louer : élégant appartement d’architecte surplombant la baie de Tanger et le détroit de Gibraltar. Décoré avec raffinement, matériaux nobles, service de conciergerie haut de gamme.',
       type: PropertyType.APARTMENT,
       transactionType: TransactionType.RENT,
@@ -261,6 +289,7 @@ async function main() {
       bedrooms: 3,
       bathrooms: 2,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: true,
       coverImage: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'B',
@@ -285,6 +314,7 @@ async function main() {
     data: {
       title: 'Domaine de la Forêt — Villa Contemporaine en Lisière Boisée',
       slug: 'domaine-de-la-foret-bouskoura-casablanca',
+      reference: propertyReference('V'),
       description: 'Havre de paix à seulement 15 minutes du centre d’affaires CFC. Villa contemporaine nichée dans la verdure de Bouskoura, conçue pour une vie de famille sereine et des réceptions prestigieuses.',
       type: PropertyType.VILLA,
       transactionType: TransactionType.BUY,
@@ -297,6 +327,7 @@ async function main() {
       bedrooms: 4,
       bathrooms: 4,
       status: PropertyStatus.AVAILABLE,
+      isPublished: true,
       isFeatured: false,
       coverImage: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85',
       energyRating: 'A',
@@ -390,12 +421,12 @@ async function main() {
       year: 2024,
       description: 'Conception d’un espace de réception contemporain mêlant claustras verticaux en noyer d’Amérique, cheminée centrale suspendue et mobilier sur mesure habillé de bouclettes Pierre Frey.',
       designApproach: 'Privilégier la fluidité des circulations et l’acoustique feutrée grâce à des panneaux bois micro-perforés intégrés.',
-      materials: ['Noyer d’Amérique', 'Pierre calcaire de Bourgogne', 'Laiton brossé', 'Tissus Pierre Frey'],
+      materials: serializeStringArray(['Noyer d’Amérique', 'Pierre calcaire de Bourgogne', 'Laiton brossé', 'Tissus Pierre Frey']),
       coverImage: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=85',
-      galleryImages: [
+      galleryImages: serializeStringArray([
         'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=85',
         'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
-      ],
+      ]),
       isFeatured: true,
       isPublished: true,
     },
@@ -411,11 +442,11 @@ async function main() {
       year: 2024,
       description: 'Îlot central sculpté en marbre Nero Marquina avec découpes invisibles et cuisson à induction sous plan TPB Tech.',
       designApproach: 'Épure totale : dissimulation de tout l’électroménager derrière des parois affleurantes en laque mate anti-traces.',
-      materials: ['Marbre Nero Marquina', 'Chêne teinté sombre', 'Inox brossé mat'],
+      materials: serializeStringArray(['Marbre Nero Marquina', 'Chêne teinté sombre', 'Inox brossé mat']),
       coverImage: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=85',
-      galleryImages: [
+      galleryImages: serializeStringArray([
         'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1600&q=85',
-      ],
+      ]),
       isFeatured: true,
       isPublished: true,
     },
@@ -431,11 +462,11 @@ async function main() {
       year: 2024,
       description: 'Réinterprétation architecturale du rituel marocain du hammam avec voûte douce en tadelakt gris perle et banquettes chauffantes.',
       designApproach: 'Lumière rasante indirecte et jeu d’ombres pour une atmosphère contemplative et régénérante.',
-      materials: ['Tadelakt artisanal', 'Marbre vert d’Oued Zem', 'Robinetterie Vola en bronze fumé'],
+      materials: serializeStringArray(['Tadelakt artisanal', 'Marbre vert d’Oued Zem', 'Robinetterie Vola en bronze fumé']),
       coverImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=85',
-      galleryImages: [
+      galleryImages: serializeStringArray([
         'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=85',
-      ],
+      ]),
       isFeatured: true,
       isPublished: true,
     },

@@ -20,6 +20,7 @@ import usersRouter from './modules/users/users.routes.js';
 import settingsRouter from './modules/settings/settings.routes.js';
 import mediaRouter from './modules/media/media.routes.js';
 import reviewsRouter from './modules/reviews/reviews.routes.js';
+import favoritesRouter from './modules/favorites/favorites.routes.js';
 
 export const createApp = (): Express => {
   const app = express();
@@ -97,6 +98,7 @@ export const createApp = (): Express => {
   app.use('/api/v1/settings', settingsRouter);
   app.use('/api/v1/media', mediaRouter);
   app.use('/api/v1/reviews', reviewsRouter);
+  app.use('/api/v1/favorites', favoritesRouter);
 
   // Error Handler
   app.use(errorHandler);

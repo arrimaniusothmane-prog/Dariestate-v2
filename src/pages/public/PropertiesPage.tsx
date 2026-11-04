@@ -10,6 +10,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { PropertyCard } from '../../components/ui/PropertyCard';
@@ -24,6 +25,7 @@ export const PropertiesPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [properties, setProperties] = useState<Property[]>([]);
 
   // State initialized from URL query params
@@ -48,11 +50,18 @@ export const PropertiesPage: React.FC = () => {
   useEffect(() => {
     const fetchProps = async () => {
       setIsLoading(true);
+      setLoadError('');
       try {
         const data = await api.properties.getAll(filters);
         setProperties(data);
       } catch (e) {
         console.error('Failed to load properties:', e);
+        setProperties([]);
+        setLoadError(
+          e instanceof Error
+            ? e.message
+            : 'Impossible de charger le catalogue pour le moment.'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -230,6 +239,8 @@ export const PropertiesPage: React.FC = () => {
                     <option value="ALL">{t('search.allTypes')}</option>
                     <option value="VILLA">{t('search.villa')}</option>
                     <option value="APARTMENT">{t('search.apartment')}</option>
+                    <option value="HOUSE">Maison</option>
+                    <option value="DUPLEX">Duplex</option>
                     <option value="PENTHOUSE">{t('search.penthouse')}</option>
                     <option value="LAND">{t('search.land')}</option>
                     <option value="COMMERCIAL">{t('search.commercial')}</option>
@@ -336,6 +347,16 @@ export const PropertiesPage: React.FC = () => {
         </div>
       </div>
 
+      {loadError && (
+        <div className="mb-6 p-4 rounded border border-red-200 bg-red-50 text-red-800 text-xs flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-bold">Le catalogue est momentanément indisponible.</p>
+            <p className="mt-1">{loadError}</p>
+          </div>
+        </div>
+      )}
+
       {/* Property Cards Grid / List with Staggered Entrance */}
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-12">
@@ -343,7 +364,7 @@ export const PropertiesPage: React.FC = () => {
             <div key={n} className="bg-white rounded-luxury h-80 animate-pulse border border-beige/40" />
           ))}
         </div>
-      ) : paginatedProps.length > 0 ? (
+      ) : loadError ? null : paginatedProps.length > 0 ? (
         <StaggerContainer
           key={`${currentPage}-${viewMode}`}
           className={

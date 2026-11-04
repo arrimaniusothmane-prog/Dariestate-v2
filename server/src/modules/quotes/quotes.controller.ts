@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma.js';
 import { AuthRequest } from '../../middleware/auth.js';
-import { QuoteStatus } from '@prisma/client';
+import { QuoteStatus } from '../../types/enums.js';
 
 const quoteCreateSchema = z.object({
   fullName: z.string().min(2, 'Nom complet requis'),
@@ -35,7 +35,7 @@ export const createQuoteRequest = async (req: Request, res: Response): Promise<v
       budgetRange: data.budgetRange,
       expectedStartDate: data.expectedStartDate,
       description: data.description,
-      attachments: data.attachments || [],
+      attachments: JSON.stringify(data.attachments || []),
       status: QuoteStatus.PENDING,
     },
   });
@@ -43,7 +43,7 @@ export const createQuoteRequest = async (req: Request, res: Response): Promise<v
   res.status(201).json({
     success: true,
     message: 'Votre demande de devis a été enregistrée avec succès. Notre direction des projets vous contactera sous 24 à 48 heures.',
-    data: quote,
+    data: { ...quote, attachments: data.attachments || [] },
   });
 };
 
@@ -55,9 +55,9 @@ export const getQuoteRequests = async (req: AuthRequest, res: Response): Promise
   if (projectType) where.projectType = projectType as string;
   if (search) {
     where.OR = [
-      { fullName: { contains: search as string, mode: 'insensitive' } },
-      { email: { contains: search as string, mode: 'insensitive' } },
-      { city: { contains: search as string, mode: 'insensitive' } },
+      { fullName: { contains: search as string } },
+      { email: { contains: search as string } },
+      { city: { contains: search as string } },
     ];
   }
 
@@ -69,7 +69,19 @@ export const getQuoteRequests = async (req: AuthRequest, res: Response): Promise
     },
   });
 
-  res.json({ success: true, data: quotes });
+  res.json({
+    success: true,
+    data: quotes.map((quote) => ({
+      ...quote,
+      attachments: (() => {
+        try {
+          return JSON.parse(quote.attachments || '[]');
+        } catch {
+          return [];
+        }
+      })(),
+    })),
+  });
 };
 
 export const updateQuoteRequest = async (req: AuthRequest, res: Response): Promise<void> => {

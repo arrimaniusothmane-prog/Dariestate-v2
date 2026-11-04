@@ -20,6 +20,7 @@ import { RequestQuotePage } from './pages/public/RequestQuotePage';
 import { PrivacyPolicyPage, TermsPage } from './pages/public/LegalPages';
 import { LoginPage } from './pages/public/LoginPage';
 import { RegisterPage } from './pages/public/RegisterPage';
+import { UserDashboardPage } from './pages/public/UserDashboardPage';
 
 // Admin Pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
@@ -68,6 +69,7 @@ export const App: React.FC = () => {
           <Route path="/terms" element={<PublicLayout><TermsPage /></PublicLayout>} />
           <Route path="/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
           <Route path="/register" element={<PublicLayout><RegisterPage /></PublicLayout>} />
+          <Route path="/dashboard" element={<PublicLayout><UserDashboardPage /></PublicLayout>} />
           <Route path="/admin/login" element={<PublicLayout><LoginPage /></PublicLayout>} />
 
           {/* Admin Dashboard Pages */}

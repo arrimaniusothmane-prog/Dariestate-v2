@@ -79,8 +79,11 @@ export interface User {
   role: UserRole;
   avatar?: string | null;
   isActive: boolean;
+  isEmailVerified: boolean;
   createdAt: string;
 }
+
+export type PropertyCondition = 'NEW' | 'EXCELLENT' | 'GOOD' | 'TO_RENOVATE';
 
 export interface PropertyImage {
   id: string;
@@ -99,6 +102,7 @@ export interface PropertyFeature {
 
 export interface Property {
   id: string;
+  reference?: string;
   title: string;
   slug: string;
   description: string;
@@ -109,16 +113,31 @@ export interface Property {
   city: string;
   neighborhood: string;
   address: string;
+  latitude?: number | null;
+  longitude?: number | null;
   surfaceArea: number;
+  landArea?: number | null;
   bedrooms: number;
   bathrooms: number;
+  floors?: number;
+  garage?: boolean;
+  garden?: boolean;
+  swimmingPool?: boolean;
+  terrace?: boolean;
+  furnished?: boolean;
+  condition?: PropertyCondition;
+  constructionYear?: number | null;
+  availability?: PropertyStatus;
   status: PropertyStatus;
+  isPublished?: boolean;
   isFeatured: boolean;
   coverImage: string;
+  videoUrl?: string | null;
   energyRating?: string | null;
   yearBuilt?: number | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
+  publishedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   images: PropertyImage[];

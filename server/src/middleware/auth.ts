@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/env.js';
 import { prisma } from '../config/prisma.js';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../types/enums.js';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -34,11 +34,38 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       return;
     }
 
-    req.user = user;
+    req.user = { ...user, role: user.role as UserRole };
     next();
   } catch (error) {
     res.status(401).json({ success: false, message: 'Jeton invalide ou expiré.' });
   }
+};
+
+/**
+ * Attaches the current user when a valid token is present, but never blocks
+ * anonymous traffic. Useful for public pages that also support staff previews.
+ */
+export const optionalAuthenticate = async (req: AuthRequest, _res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      next();
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, config.jwtSecret) as { id: string; email: string; role: UserRole };
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { id: true, email: true, role: true, name: true, isActive: true },
+    });
+    if (user?.isActive) {
+      req.user = { ...user, role: user.role as UserRole };
+    }
+  } catch {
+    // Invalid tokens are simply treated as anonymous visitors.
+  }
+  next();
 };
 
 export const requireRoles = (allowedRoles: UserRole[]) => {

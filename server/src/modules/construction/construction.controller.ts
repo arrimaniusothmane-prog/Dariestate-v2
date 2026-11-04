@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma.js';
 import { AuthRequest } from '../../middleware/auth.js';
-import { ConstructionStatus } from '@prisma/client';
+import { ConstructionStatus } from '../../types/enums.js';
 
 const projectCreateSchema = z.object({
   title: z.string().min(3),

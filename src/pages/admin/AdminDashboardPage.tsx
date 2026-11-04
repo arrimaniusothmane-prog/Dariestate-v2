@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Building2,
@@ -29,16 +29,34 @@ import { StaggerContainer, StaggerItem } from '../../components/animations';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../services/authContext';
 import { LocalStore } from '../../services/storage';
+import { api } from '../../services/api';
+import { Property } from '../../types';
 
 export const AdminDashboardPage: React.FC = () => {
   const { t, formatPrice } = useLanguage();
   const { user } = useAuth();
 
-  const properties = LocalStore.getProperties();
+  const [properties, setProperties] = useState<Property[]>([]);
   const inquiries = LocalStore.getInquiries();
   const quotes = LocalStore.getQuotes();
   const projects = LocalStore.getConstructionProjects();
   const activities = LocalStore.getActivityLogs().slice(0, 8);
+
+  useEffect(() => {
+    let active = true;
+    const loadProperties = async () => {
+      try {
+        const data = await api.properties.getAllAdmin({ limit: 500 });
+        if (active) setProperties(data);
+      } catch (error) {
+        console.error('Impossible de charger les statistiques immobilières :', error);
+      }
+    };
+    void loadProperties();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const availableProps = properties.filter((p) => p.status === 'AVAILABLE').length;
   const newInquiries = inquiries.filter((i) => i.status === 'NEW').length;

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createInquiry, getInquiries, updateInquiry } from './inquiries.controller.js';
 import { authenticate, requireRoles } from '../../middleware/auth.js';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '../../types/enums.js';
 
 const router = Router();
 

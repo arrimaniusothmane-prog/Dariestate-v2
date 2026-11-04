@@ -1,48 +1,106 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Property } from '../types';
 import { LocalStore } from './storage';
+import { api } from './api';
+import { useAuth } from './authContext';
 
 interface FavoritesContextType {
   favoriteIds: string[];
   favorites: Property[];
-  toggleFavorite: (property: Property) => boolean;
+  toggleFavorite: (property: Property) => Promise<boolean>;
   isFavorite: (id: string) => boolean;
   favoritesCount: number;
+  isLoading: boolean;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
   const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('daratelier_favorites');
-      return saved ? JSON.parse(saved) : ['prop-1', 'prop-3'];
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return ['prop-1', 'prop-3'];
+      return [];
     }
   });
-
+  const [favorites, setFavorites] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem('daratelier_favorites', JSON.stringify(favoriteIds));
   }, [favoriteIds]);
 
-  const allProps = LocalStore.getProperties();
-  const favorites = allProps.filter((p) => favoriteIds.includes(p.id));
+  useEffect(() => {
+    const loadFavorites = async () => {
+      if (isAuthenticated) {
+        setIsLoading(true);
+        try {
+          const favs = await api.favorites.getAll();
+          setFavorites(favs);
+          setFavoriteIds(favs.map(f => f.id));
+        } catch (e) {
+          console.error('Failed to load favorites:', e);
+          // Fallback to localStorage
+          const allProps = LocalStore.getProperties();
+          const localFavs = allProps.filter((p) => favoriteIds.includes(p.id));
+          setFavorites(localFavs);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // Not authenticated, use localStorage
+        const allProps = LocalStore.getProperties();
+        const localFavs = allProps.filter((p) => favoriteIds.includes(p.id));
+        setFavorites(localFavs);
+      }
+    };
 
-  const toggleFavorite = (property: Property): boolean => {
+    loadFavorites();
+  }, [isAuthenticated]);
+
+  const toggleFavorite = async (property: Property): Promise<boolean> => {
     const exists = favoriteIds.includes(property.id);
-    let next: string[];
-    if (exists) {
-      next = favoriteIds.filter((id) => id !== property.id);
-      setToastMessage(`"${property.title.slice(0, 30)}..." retiré des favoris`);
+    let success = false;
+
+    if (isAuthenticated) {
+      try {
+        if (exists) {
+          success = await api.favorites.remove(property.id);
+        } else {
+          success = await api.favorites.add(property.id);
+        }
+      } catch (e) {
+        console.error('Failed to toggle favorite:', e);
+        success = false;
+      }
     } else {
-      next = [...favoriteIds, property.id];
-      setToastMessage(`"${property.title.slice(0, 30)}..." ajouté à vos favoris`);
+      // Local fallback for unauthenticated users
+      success = true;
     }
-    setFavoriteIds(next);
-    setTimeout(() => setToastMessage(null), 3500);
+
+    if (success) {
+      let next: string[];
+      if (exists) {
+        next = favoriteIds.filter((id) => id !== property.id);
+        setToastMessage(`"${property.title.slice(0, 30)}..." retiré des favoris`);
+      } else {
+        next = [...favoriteIds, property.id];
+        setToastMessage(`"${property.title.slice(0, 30)}..." ajouté à vos favoris`);
+      }
+      setFavoriteIds(next);
+
+      if (exists) {
+        setFavorites(favorites.filter(f => f.id !== property.id));
+      } else {
+        setFavorites([...favorites, property]);
+      }
+
+      setTimeout(() => setToastMessage(null), 3500);
+    }
+
     return !exists;
   };
 
@@ -56,6 +114,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         toggleFavorite,
         isFavorite,
         favoritesCount: favorites.length,
+        isLoading,
       }}
     >
       {children}

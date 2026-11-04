@@ -1,155 +1,94 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// DAR & ATELIER database schema
+// SQLite keeps the demo fully functional without an external database server.
+// Enum-like values are stored as validated strings (see src/types/enums.ts).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  AGENT
-  CONSTRUCTION_MANAGER
-  INTERIOR_DESIGNER
-  SALES_REP
-  CLIENT
-}
-
-enum PropertyType {
-  VILLA
-  APARTMENT
-  HOUSE
-  LAND
-  COMMERCIAL
-  OFFICE
-  PENTHOUSE
-  DUPLEX
-}
-
-enum TransactionType {
-  BUY
-  RENT
-}
-
-enum PropertyStatus {
-  DRAFT
-  AVAILABLE
-  UNDER_OFFER
-  RESERVED
-  SOLD
-  RENTED
-}
-
-enum InquiryStatus {
-  NEW
-  CONTACTED
-  QUALIFIED
-  VISIT_SCHEDULED
-  NEGOTIATION
-  CONVERTED
-  LOST
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum QuoteStatus {
-  PENDING
-  UNDER_REVIEW
-  SITE_VISIT_REQUIRED
-  QUOTE_PREPARED
-  SENT_TO_CLIENT
-  ACCEPTED
-  REJECTED
-  COMPLETED
-}
-
-enum ConstructionStatus {
-  PLANNING
-  PERMIT_ACQUIRED
-  FOUNDATION
-  STRUCTURE
-  FINISHING
-  COMPLETED
-  ON_HOLD
-}
-
-enum DesignCategory {
-  LIVING_ROOM
-  KITCHEN
-  BEDROOM
-  BATHROOM
-  OFFICE
-  OUTDOOR
-  CUSTOM_FURNITURE
-  FULL_VILLA
-  RENOVATION
-}
-
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String
-  name         String
-  phone        String?
-  role         UserRole  @default(CLIENT)
-  avatar       String?
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                        String    @id @default(uuid())
+  email                     String    @unique
+  passwordHash              String
+  name                      String
+  phone                     String?
+  role                      String    @default("CLIENT")
+  avatar                    String?
+  isActive                  Boolean   @default(true)
+  isEmailVerified           Boolean   @default(false)
+  emailVerificationToken    String?   @unique
+  emailVerificationExpires  DateTime?
+  resetPasswordToken        String?   @unique
+  resetPasswordExpires      DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 
-  assignedInquiries     Inquiry[]             @relation("AssignedInquiries")
-  assignedQuotes        QuoteRequest[]        @relation("AssignedQuotes")
-  managedProjects       ConstructionProject[] @relation("ManagedProjects")
-  inquiryNotes          InquiryNote[]
-  activityLogs          ActivityLog[]
-  favorites             Favorite[]
+  assignedInquiries Inquiry[]             @relation("AssignedInquiries")
+  assignedQuotes    QuoteRequest[]        @relation("AssignedQuotes")
+  managedProjects   ConstructionProject[] @relation("ManagedProjects")
+  inquiryNotes      InquiryNote[]
+  activityLogs      ActivityLog[]
+  favorites         Favorite[]
 }
 
 model Property {
-  id              String          @id @default(uuid())
+  id              String    @id @default(uuid())
+  reference       String    @unique
   title           String
-  slug            String          @unique
+  slug            String    @unique
   description     String
-  type            PropertyType
-  transactionType TransactionType
+  type            String
+  transactionType String
   price           Float
-  currency        String          @default("MAD")
+  currency        String    @default("MAD")
   city            String
   neighborhood    String
   address         String
+  latitude        Float?
+  longitude       Float?
   surfaceArea     Float
-  bedrooms        Int
-  bathrooms       Int
-  status          PropertyStatus  @default(AVAILABLE)
-  isFeatured      Boolean         @default(false)
+  landArea        Float?
+  bedrooms        Int       @default(0)
+  bathrooms       Int       @default(0)
+  floors          Int       @default(0)
+  garage          Boolean   @default(false)
+  garden          Boolean   @default(false)
+  swimmingPool    Boolean   @default(false)
+  terrace         Boolean   @default(false)
+  furnished       Boolean   @default(false)
+  condition       String    @default("NEW")
+  constructionYear Int?
+  availability    String    @default("AVAILABLE")
+  status          String    @default("DRAFT")
+  isPublished     Boolean   @default(false)
+  isFeatured      Boolean   @default(false)
   coverImage      String
+  videoUrl        String?
   energyRating    String?
   yearBuilt       Int?
   metaTitle       String?
   metaDescription String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
-  images      PropertyImage[]
-  features    PropertyFeature[]
-  favorites   Favorite[]
-  inquiries   Inquiry[]
+  images    PropertyImage[]
+  features  PropertyFeature[]
+  favorites Favorite[]
+  inquiries Inquiry[]
 
   @@index([slug])
+  @@index([reference])
   @@index([city])
   @@index([type])
   @@index([transactionType])
   @@index([status])
+  @@index([isPublished])
 }
 
 model PropertyImage {
@@ -171,7 +110,8 @@ model PropertyFeature {
   id         String @id @default(uuid())
   propertyId String
   name       String
-  category   String? // e.g., "Comfort", "Security", "Exterior", "Tech"
+  category   String?
+  icon       String?
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
@@ -185,32 +125,32 @@ model Favorite {
   ipSession  String?
   createdAt  DateTime @default(now())
 
-  user     User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  property Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, propertyId])
   @@index([propertyId])
 }
 
 model Inquiry {
-  id                     String        @id @default(uuid())
+  id                     String    @id @default(uuid())
   name                   String
   email                  String
   phone                  String
   propertyId             String?
   subject                String
   message                String
-  preferredContactMethod String        @default("PHONE") // PHONE, EMAIL, WHATSAPP
-  source                 String        @default("WEBSITE")
-  priority               Priority      @default(MEDIUM)
-  status                 InquiryStatus @default(NEW)
+  preferredContactMethod String    @default("PHONE")
+  source                 String    @default("WEBSITE")
+  priority               String    @default("MEDIUM")
+  status                 String    @default("NEW")
   assignedToId           String?
   followUpDate           DateTime?
-  createdAt              DateTime      @default(now())
-  updatedAt              DateTime      @updatedAt
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
-  property   Property?     @relation(fields: [propertyId], references: [id], onDelete: SetNull)
-  assignedTo User?         @relation("AssignedInquiries", fields: [assignedToId], references: [id], onDelete: SetNull)
+  property   Property?    @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  assignedTo User?        @relation("AssignedInquiries", fields: [assignedToId], references: [id], onDelete: SetNull)
   notes      InquiryNote[]
 
   @@index([status])
@@ -232,25 +172,25 @@ model InquiryNote {
 }
 
 model QuoteRequest {
-  id                String      @id @default(uuid())
+  id                String    @id @default(uuid())
   fullName          String
   email             String
   phone             String
   city              String
-  projectType       String // VILLA_CONSTRUCTION, APARTMENT_BUILDING, RENOVATION, INTERIOR_DESIGN, LANDSCAPING, OTHER
+  projectType       String
   plotSize          Float?
   estimatedArea     Float?
   numberOfFloors    Int?
   budgetRange       String?
   expectedStartDate String?
   description       String
-  status            QuoteStatus @default(PENDING)
+  status            String    @default("PENDING")
   proposedPrice     Float?
   assignedToId      String?
   internalNotes     String?
-  attachments       String[]    @default([])
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  attachments       String    @default("[]")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   assignedTo User? @relation("AssignedQuotes", fields: [assignedToId], references: [id], onDelete: SetNull)
 
@@ -259,24 +199,24 @@ model QuoteRequest {
 }
 
 model ConstructionProject {
-  id                     String             @id @default(uuid())
+  id                     String    @id @default(uuid())
   title                  String
   clientName             String
   clientEmail            String
   clientPhone            String
-  category               String // "Contemporary Villa", "Residential Complex", "Riad Renovation"
+  category               String
   location               String
   contractAmount         Float
-  currency               String             @default("MAD")
+  currency               String    @default("MAD")
   startDate              DateTime
   expectedCompletionDate DateTime
-  status                 ConstructionStatus @default(PLANNING)
-  progressPercentage     Int                @default(0)
+  status                 String    @default("PLANNING")
+  progressPercentage     Int       @default(0)
   projectManagerId       String?
   coverImage             String
   description            String
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   projectManager User?                   @relation("ManagedProjects", fields: [projectManagerId], references: [id], onDelete: SetNull)
   milestones     ConstructionMilestone[]
@@ -300,22 +240,23 @@ model ConstructionMilestone {
 }
 
 model DesignProject {
-  id             String         @id @default(uuid())
+  id             String    @id @default(uuid())
   title          String
-  slug           String         @unique
-  category       DesignCategory
+  slug           String    @unique
+  category       String
   location       String?
   surfaceArea    Float?
-  year           Int            @default(2025)
+  year           Int       @default(2025)
   description    String
   designApproach String
-  materials      String[]       @default([])
+  // SQLite does not support scalar lists or Json; the API serializes these as JSON strings.
+  materials      String    @default("[]")
   coverImage     String
-  galleryImages  String[]       @default([])
-  isFeatured     Boolean        @default(false)
-  isPublished    Boolean        @default(true)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  galleryImages  String    @default("[]")
+  isFeatured     Boolean   @default(false)
+  isPublished    Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([category])
   @@index([isFeatured])
@@ -324,10 +265,11 @@ model DesignProject {
 model Review {
   id          String   @id @default(uuid())
   clientName  String
-  clientRole  String?  // e.g. "Propriétaire Villa Anfa", "Investisseur"
+  clientRole  String?
+  avatarUrl   String?
   rating      Int      @default(5)
   comment     String
-  projectType String?  // "Construction Villa", "Aménagement Intérieur"
+  projectType String?
   isVerified  Boolean  @default(true)
   isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -336,8 +278,8 @@ model Review {
 model ActivityLog {
   id         String   @id @default(uuid())
   userId     String?
-  action     String   // "PROPERTY_CREATED", "STATUS_UPDATED", "QUOTE_CONVERTED"
-  entityType String   // "Property", "Inquiry", "Quote", "Project"
+  action     String
+  entityType String
   entityId   String?
   details    String?
   ipAddress  String?
@@ -350,22 +292,22 @@ model ActivityLog {
 }
 
 model CompanySettings {
-  id                         String   @id @default("default")
-  companyName                String   @default("DAR & ATELIER Architecture & Immobilier")
-  logoUrl                    String?
-  email                      String   @default("contact@dar-atelier.ma")
-  phone                      String   @default("+212 5 22 45 80 90")
-  whatsapp                   String   @default("+212 6 61 23 45 67")
-  address                    String   @default("Boulevard d'Anfa, Tour Casablanca Finance City, Étage 14")
-  city                       String   @default("Casablanca")
-  country                    String   @default("Maroc")
-  defaultCurrency            String   @default("MAD")
-  defaultLanguage            String   @default("fr")
-  facebookUrl                String?  @default("https://facebook.com/daratelier")
-  instagramUrl               String?  @default("https://instagram.com/daratelier")
-  linkedinUrl                String?  @default("https://linkedin.com/company/daratelier")
-  metaTitle                  String   @default("DAR & ATELIER | Architecture d'Exception & Immobilier de Prestige")
-  metaDescription            String   @default("Villas d'architectes, appartements haut standing, construction sur mesure et aménagement d'espaces exclusifs au Maroc.")
-  emailNotificationsEnabled  Boolean  @default(true)
-  updatedAt                  DateTime @updatedAt
+  id                        String   @id @default("default")
+  companyName               String   @default("DAR & ATELIER Architecture & Immobilier")
+  logoUrl                   String?
+  email                     String   @default("contact@dar-atelier.ma")
+  phone                     String   @default("+212 5 22 45 80 90")
+  whatsapp                  String   @default("+212 6 61 23 45 67")
+  address                   String   @default("Boulevard d'Anfa, Tour Casablanca Finance City, Étage 14")
+  city                      String   @default("Casablanca")
+  country                   String   @default("Maroc")
+  defaultCurrency           String   @default("MAD")
+  defaultLanguage           String   @default("fr")
+  facebookUrl               String?  @default("https://facebook.com/daratelier")
+  instagramUrl              String?  @default("https://instagram.com/daratelier")
+  linkedinUrl               String?  @default("https://linkedin.com/company/daratelier")
+  metaTitle                 String   @default("DAR & ATELIER | Architecture d'Exception & Immobilier de Prestige")
+  metaDescription           String   @default("Villas d'architectes, appartements haut standing, construction sur mesure et aménagement d'espaces exclusifs au Maroc.")
+  emailNotificationsEnabled Boolean  @default(true)
+  updatedAt                 DateTime @updatedAt
 }

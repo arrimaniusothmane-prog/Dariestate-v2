@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -23,6 +23,8 @@ import {
 import { useLanguage } from '../../i18n/LanguageContext';
 import { PropertyCard } from '../../components/ui/PropertyCard';
 import { LocalStore } from '../../services/storage';
+import { api } from '../../services/api';
+import { Property } from '../../types';
 import { STOCK } from '../../services/imageLibrary';
 import { TEAM_MEMBERS, ATELIER_VALUES } from '../../services/team';
 import { RevealOnScroll, StaggerContainer, StaggerItem, luxuryEase } from '../../components/animations';
@@ -37,10 +39,39 @@ export const HomePage: React.FC = () => {
   const [city, setCity] = useState<string>('ALL');
   const [budgetMax, setBudgetMax] = useState<string>('');
 
-  const properties = LocalStore.getProperties().filter((p) => p.isFeatured || p.status === 'AVAILABLE').slice(0, 6);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [isPropertiesLoading, setIsPropertiesLoading] = useState(true);
   const constructionProjects = LocalStore.getConstructionProjects().slice(0, 3);
   const designProjects = LocalStore.getDesignProjects().slice(0, 4);
   const reviews = LocalStore.getReviews().filter((r) => r.isPublished).slice(0, 3);
+
+  useEffect(() => {
+    let active = true;
+    const loadProperties = async () => {
+      try {
+        const data = await api.properties.getAll();
+        if (!active) return;
+        setFeaturedProperties(
+          data
+            .filter(
+              (property) =>
+                (property.isFeatured || property.status === 'AVAILABLE') &&
+                property.status !== 'SOLD' &&
+                property.status !== 'RENTED'
+            )
+            .slice(0, 6)
+        );
+      } catch (error) {
+        console.error('Impossible de charger les biens mis en avant :', error);
+      } finally {
+        if (active) setIsPropertiesLoading(false);
+      }
+    };
+    void loadProperties();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -444,12 +475,39 @@ export const HomePage: React.FC = () => {
         </RevealOnScroll>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {properties.map((prop) => (
-            <StaggerItem key={prop.id}>
-              <PropertyCard property={prop} />
-            </StaggerItem>
-          ))}
+          {isPropertiesLoading
+            ? Array.from({ length: 3 }).map((_, index) => (
+                <StaggerItem key={`property-skeleton-${index}`}>
+                  <div className="bg-white rounded-luxury border border-beige/40 overflow-hidden animate-pulse">
+                    <div className="aspect-[4/3] bg-ivory-200" />
+                    <div className="p-5 space-y-3">
+                      <div className="h-4 bg-ivory-200 rounded w-3/4" />
+                      <div className="h-3 bg-ivory-100 rounded w-1/2" />
+                      <div className="h-8 bg-ivory-100 rounded w-full" />
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))
+            : featuredProperties.map((prop) => (
+                <StaggerItem key={prop.id}>
+                  <PropertyCard property={prop} />
+                </StaggerItem>
+              ))}
         </StaggerContainer>
+
+        {!isPropertiesLoading && featuredProperties.length === 0 && (
+          <div className="mt-8 p-8 rounded-luxury border border-beige/50 bg-white text-center">
+            <p className="text-sm text-mutedgray">
+              Aucun bien n’est publié pour le moment. Revenez bientôt ou contactez-nous pour une recherche personnalisée.
+            </p>
+            <Link
+              to="/contact"
+              className="inline-flex mt-4 text-xs font-semibold uppercase tracking-wider text-bronze hover:text-clay"
+            >
+              Parler à un conseiller
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* 5. SERVICES */}

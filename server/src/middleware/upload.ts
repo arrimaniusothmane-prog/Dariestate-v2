@@ -20,11 +20,21 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'application/pdf'];
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/avif',
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+    'video/quicktime',
+    'application/pdf',
+  ];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Format de fichier non supporté. Formats acceptés : JPEG, PNG, WEBP, AVIF, PDF.'));
+    cb(new Error('Format non supporté. Formats acceptés : JPEG, PNG, WEBP, AVIF, MP4, WEBM, PDF.'));
   }
 };
 
@@ -32,6 +42,6 @@ export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB (service validation enforces 10MB for photos)
   },
 });

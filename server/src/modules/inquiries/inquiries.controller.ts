@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../config/prisma.js';
 import { AuthRequest } from '../../middleware/auth.js';
-import { InquiryStatus, Priority } from '@prisma/client';
+import { InquiryStatus, Priority } from '../../types/enums.js';
 
 const inquiryCreateSchema = z.object({
   name: z.string().min(2, 'Le nom est requis'),
@@ -50,10 +50,10 @@ export const getInquiries = async (req: AuthRequest, res: Response): Promise<voi
 
   if (search) {
     where.OR = [
-      { name: { contains: search as string, mode: 'insensitive' } },
-      { email: { contains: search as string, mode: 'insensitive' } },
+      { name: { contains: search as string } },
+      { email: { contains: search as string } },
       { phone: { contains: search as string } },
-      { subject: { contains: search as string, mode: 'insensitive' } },
+      { subject: { contains: search as string } },
     ];
   }
 

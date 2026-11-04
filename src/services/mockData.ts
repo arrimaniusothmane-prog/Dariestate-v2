@@ -10,6 +10,7 @@ export const INITIAL_USERS: User[] = [
     phone: '+212 6 61 00 11 22',
     avatar: STOCK.team.youssef,
     isActive: true,
+    isEmailVerified: true,
     createdAt: '2024-01-15T10:00:00Z',
   },
   {
@@ -20,6 +21,7 @@ export const INITIAL_USERS: User[] = [
     phone: '+212 6 62 33 44 55',
     avatar: STOCK.team.karim,
     isActive: true,
+    isEmailVerified: true,
     createdAt: '2024-02-01T11:00:00Z',
   },
   {
@@ -30,6 +32,7 @@ export const INITIAL_USERS: User[] = [
     phone: '+212 6 63 55 66 77',
     avatar: STOCK.team.mehdi,
     isActive: true,
+    isEmailVerified: true,
     createdAt: '2024-02-10T09:30:00Z',
   },
   {
@@ -40,6 +43,7 @@ export const INITIAL_USERS: User[] = [
     phone: '+212 6 64 77 88 99',
     avatar: STOCK.team.leila,
     isActive: true,
+    isEmailVerified: true,
     createdAt: '2024-03-05T14:15:00Z',
   },
   {
@@ -50,6 +54,7 @@ export const INITIAL_USERS: User[] = [
     phone: '+212 6 61 88 99 00',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
     isActive: true,
+    isEmailVerified: true,
     createdAt: '2024-04-12T16:20:00Z',
   },
 ];

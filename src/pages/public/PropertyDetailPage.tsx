@@ -19,6 +19,12 @@ import {
   ChevronRight,
   X,
   MessageCircle,
+  Layers,
+  Car,
+  Trees,
+  Waves,
+  Sofa,
+  PlayCircle,
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useFavorites } from '../../services/favoritesContext';
@@ -69,7 +75,15 @@ export const PropertyDetailPage: React.FC = () => {
           setProperty(prop);
           const allProps = await api.properties.getAll();
           setSimilarProperties(
-            allProps.filter((p) => p.id !== prop.id && (p.city === prop.city || p.type === prop.type)).slice(0, 3)
+            allProps
+              .filter(
+                (p) =>
+                  p.id !== prop.id &&
+                  p.status !== 'SOLD' &&
+                  p.status !== 'RENTED' &&
+                  (p.city === prop.city || p.type === prop.type)
+              )
+              .slice(0, 3)
           );
         }
       } catch (e) {
@@ -164,6 +178,58 @@ export const PropertyDetailPage: React.FC = () => {
   const advisor = TEAM_MEMBERS.find((member) => member.shortRole === 'Immobilier') || TEAM_MEMBERS[0];
   const phoneHref = `tel:${advisor.phone.replace(/\s/g, '')}`;
 
+  const statusLabels: Record<string, string> = {
+    DRAFT: 'Brouillon',
+    AVAILABLE: 'Disponible',
+    UNDER_OFFER: 'Offre en cours',
+    RESERVED: 'Réservé',
+    SOLD: 'Vendu',
+    RENTED: 'Loué',
+  };
+  const conditionLabels: Record<string, string> = {
+    NEW: 'Neuf',
+    EXCELLENT: 'Excellent état',
+    GOOD: 'Bon état',
+    TO_RENOVATE: 'À rénover',
+  };
+  const typeLabels: Record<string, string> = {
+    VILLA: 'Villa',
+    APARTMENT: 'Appartement',
+    HOUSE: 'Maison',
+    LAND: 'Terrain',
+    DUPLEX: 'Duplex',
+    PENTHOUSE: 'Penthouse',
+    COMMERCIAL: 'Local commercial',
+    OFFICE: 'Bureau',
+  };
+  const statusLabel = statusLabels[property.status] || property.status;
+  const isUnavailable = property.status === 'SOLD' || property.status === 'RENTED';
+  const isUnderOffer = property.status === 'UNDER_OFFER' || property.status === 'RESERVED';
+
+  const amenityNames = [
+    ...property.features.map((feature) => feature.name),
+    ...(property.garage ? ['Garage / Parking'] : []),
+    ...(property.garden ? ['Jardin privatif'] : []),
+    ...(property.swimmingPool ? ['Piscine'] : []),
+    ...(property.terrace ? ['Terrasse'] : []),
+    ...(property.furnished ? ['Meublé'] : []),
+    ...((property.floors || 0) > 0 ? [`${property.floors} niveau(x)`] : []),
+  ].filter((name, index, list) => list.indexOf(name) === index);
+
+  const hasCoordinates =
+    typeof property.latitude === 'number' &&
+    typeof property.longitude === 'number' &&
+    Number.isFinite(property.latitude) &&
+    Number.isFinite(property.longitude);
+  const mapDelta = 0.008;
+  const mapSrc = hasCoordinates
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${property.longitude! - mapDelta}%2C${
+        property.latitude! - mapDelta
+      }%2C${property.longitude! + mapDelta}%2C${property.latitude! + mapDelta}&layer=mapnik&marker=${
+        property.latitude
+      }%2C${property.longitude}`
+    : null;
+
   return (
     <div className="bg-ivory-100 min-h-screen py-10 sm:py-14 animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
@@ -203,12 +269,20 @@ export const PropertyDetailPage: React.FC = () => {
 
         {/* Title and Top Location */}
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <Badge variant="charcoal">
               {property.transactionType === 'BUY' ? t('search.buy') : t('search.rent')}
             </Badge>
-            <Badge variant="bronze">{property.type}</Badge>
+            <Badge variant="bronze">{typeLabels[property.type] || property.type}</Badge>
             {property.isFeatured && <Badge variant="outline">Signature Exclusive</Badge>}
+            <Badge variant={isUnavailable ? 'danger' : isUnderOffer ? 'warning' : 'success'}>
+              {statusLabel}
+            </Badge>
+            {property.reference && (
+              <span className="text-[10px] font-mono text-mutedgray px-2 py-1 rounded bg-white border border-beige/50">
+                Réf. {property.reference}
+              </span>
+            )}
           </div>
           <h1 className="text-2xl sm:text-4xl font-serif text-charcoal mb-2">
             {property.title}
@@ -237,8 +311,15 @@ export const PropertyDetailPage: React.FC = () => {
               <img
                 src={galleryImages[0]?.url || property.coverImage}
                 alt={property.title}
-                className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700"
+                className={`w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ${
+                  isUnavailable ? 'grayscale-[30%]' : ''
+                }`}
               />
+              {isUnavailable && (
+                <div className="absolute top-3 left-3 z-10">
+                  <Badge variant="danger" size="sm">{statusLabel}</Badge>
+                </div>
+              )}
               <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold uppercase tracking-wider backdrop-blur-xs">
                 Agrandir la photo
               </div>
@@ -319,16 +400,44 @@ export const PropertyDetailPage: React.FC = () => {
               </div>
             </div>
 
+            {(property.landArea || property.floors || property.constructionYear || property.condition) && (
+              <div className="bg-white p-4 sm:p-5 rounded-luxury border border-beige/40 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                {property.landArea ? (
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-mutedgray block">Terrain</span>
+                    <span className="font-serif font-bold text-charcoal text-base">{property.landArea} m²</span>
+                  </div>
+                ) : null}
+                {property.floors ? (
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-mutedgray block">Niveaux</span>
+                    <span className="font-serif font-bold text-charcoal text-base">{property.floors}</span>
+                  </div>
+                ) : null}
+                {property.constructionYear ? (
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-mutedgray block">Construction</span>
+                    <span className="font-serif font-bold text-charcoal text-base">{property.constructionYear}</span>
+                  </div>
+                ) : null}
+                {property.condition ? (
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-mutedgray block">État</span>
+                    <span className="font-serif font-bold text-charcoal text-base">
+                      {conditionLabels[property.condition] || property.condition}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            )}
+
             {/* Architectural Description */}
             <div className="bg-white p-6 sm:p-8 rounded-luxury border border-beige/40 shadow-sm">
               <h2 className="text-xl font-serif text-charcoal mb-4">
                 {t('property.description')}
               </h2>
               <div className="text-xs sm:text-sm text-charcoal/80 leading-relaxed space-y-4">
-                <p>{property.description}</p>
-                <p>
-                  Imaginée pour offrir une harmonie absolue entre intérieur et extérieur, cette résidence bénéficie d’une exposition idéale favorisant la lumière naturelle zénithale tout au long de la journée. Les matériaux nobles (marbre poli d'Oued Ykem, boiseries en noyer massif d’Amérique) s’associent à des équipements domotiques de dernière génération.
-                </p>
+                <p className="whitespace-pre-line">{property.description}</p>
               </div>
             </div>
 
@@ -338,12 +447,15 @@ export const PropertyDetailPage: React.FC = () => {
                 {t('property.amenities')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {property.features.map((feat) => (
-                  <div key={feat.id} className="flex items-center gap-3 text-xs sm:text-sm text-charcoal/90">
+                {amenityNames.map((name) => (
+                  <div key={name} className="flex items-center gap-3 text-xs sm:text-sm text-charcoal/90">
                     <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0" />
-                    <span>{feat.name}</span>
+                    <span>{name}</span>
                   </div>
                 ))}
+                {amenityNames.length === 0 && (
+                  <p className="text-mutedgray italic">Les équipements détaillés seront communiqués lors de votre visite.</p>
+                )}
               </div>
             </div>
 
@@ -352,25 +464,82 @@ export const PropertyDetailPage: React.FC = () => {
               <h2 className="text-xl font-serif text-charcoal mb-4">
                 Caractéristiques &amp; Diagnostic Technique
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xs">
                 <div className="p-4 bg-ivory-50 rounded border border-ivory-200">
                   <span className="text-mutedgray block mb-1">Classe Énergétique</span>
                   <span className="text-lg font-bold text-emerald-800">
-                    {property.energyRating || 'A+ (Haute Efficacité)'}
+                    {property.energyRating || 'Non communiquée'}
                   </span>
                 </div>
                 <div className="p-4 bg-ivory-50 rounded border border-ivory-200">
-                  <span className="text-mutedgray block mb-1">Année de Livraison</span>
+                  <span className="text-mutedgray block mb-1">Année de construction</span>
                   <span className="text-lg font-bold text-charcoal">
-                    {property.yearBuilt || 2024}
+                    {property.constructionYear || property.yearBuilt || 'Non communiquée'}
                   </span>
                 </div>
                 <div className="p-4 bg-ivory-50 rounded border border-ivory-200">
-                  <span className="text-mutedgray block mb-1">Statut Juridique</span>
-                  <span className="text-lg font-bold text-charcoal">Titre Foncier Purge</span>
+                  <span className="text-mutedgray block mb-1">État du bien</span>
+                  <span className="text-lg font-bold text-charcoal">
+                    {conditionLabels[property.condition || 'NEW'] || property.condition || 'Non communiqué'}
+                  </span>
+                </div>
+                <div className="p-4 bg-ivory-50 rounded border border-ivory-200">
+                  <span className="text-mutedgray block mb-1">Disponibilité</span>
+                  <span className={`text-lg font-bold ${
+                    isUnavailable ? 'text-gray-700' : isUnderOffer ? 'text-amber-700' : 'text-emerald-800'
+                  }`}>
+                    {statusLabel}
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Video tour */}
+            {property.videoUrl && (
+              <div className="bg-white p-6 sm:p-8 rounded-luxury border border-beige/40 shadow-sm">
+                <h2 className="text-xl font-serif text-charcoal mb-4 flex items-center gap-2">
+                  <PlayCircle className="w-5 h-5 text-bronze" />
+                  Visite en vidéo
+                </h2>
+                <video
+                  src={property.videoUrl}
+                  poster={property.coverImage}
+                  controls
+                  className="w-full max-h-[520px] rounded-lg bg-charcoal"
+                />
+              </div>
+            )}
+
+            {/* Location map */}
+            {mapSrc && (
+              <div className="bg-white p-6 sm:p-8 rounded-luxury border border-beige/40 shadow-sm">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <h2 className="text-xl font-serif text-charcoal">Emplacement</h2>
+                    <p className="text-xs text-mutedgray mt-1">
+                      {property.address}, {property.neighborhood}, {property.city}
+                    </p>
+                  </div>
+                  <a
+                    href={`https://www.openstreetmap.org/?mlat=${property.latitude}&mlon=${property.longitude}#map=16/${property.latitude}/${property.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-semibold text-bronze hover:underline whitespace-nowrap"
+                  >
+                    Ouvrir la carte
+                  </a>
+                </div>
+                <div className="rounded-lg overflow-hidden border border-beige/50 bg-ivory-100">
+                  <iframe
+                    title={`Carte de ${property.title}`}
+                    src={mapSrc}
+                    className="w-full h-72 sm:h-80"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Sticky Contact & Private Viewing Request */}
@@ -407,7 +576,28 @@ export const PropertyDetailPage: React.FC = () => {
                 </p>
               </div>
 
-              {submitSuccess ? (
+              {isUnderOffer && (
+                <div className="p-3 rounded bg-amber-50 text-amber-900 border border-amber-200 text-xs leading-relaxed">
+                  Ce bien fait actuellement l’objet d’une offre ou d’une réservation. Vous pouvez
+                  néanmoins nous contacter pour être informé en priorité en cas de désistement.
+                </div>
+              )}
+
+              {isUnavailable ? (
+                <div className="p-4 rounded bg-gray-50 text-gray-800 border border-gray-200 text-xs space-y-3">
+                  <p className="font-bold">Ce bien n’est plus disponible.</p>
+                  <p>
+                    Il a été marqué comme <strong>{statusLabel.toLowerCase()}</strong>. Découvrez
+                    nos biens similaires toujours disponibles ou confiez-nous votre recherche.
+                  </p>
+                  <Link
+                    to="/properties"
+                    className="inline-flex w-full items-center justify-center py-2.5 bg-charcoal hover:bg-charcoal-900 text-ivory rounded font-semibold uppercase tracking-wider"
+                  >
+                    Voir les biens disponibles
+                  </Link>
+                </div>
+              ) : submitSuccess ? (
                 <div className="p-4 rounded bg-emerald-50 text-emerald-900 border border-emerald-200 text-xs">
                   <p className="font-bold mb-1">Demande transmise avec succès !</p>
                   <p>Un conseiller privé prendra contact avec vous dans les 2 heures ouvrées.</p>

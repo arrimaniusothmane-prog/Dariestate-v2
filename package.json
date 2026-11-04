@@ -13,7 +13,9 @@
     "prisma:generate": "npm --prefix server run prisma:generate",
     "prisma:migrate": "npm --prefix server run prisma:migrate",
     "prisma:seed": "npm --prefix server run prisma:seed",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prisma:push": "npm --prefix server run prisma:push",
+    "setup": "npm --prefix server run setup"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
