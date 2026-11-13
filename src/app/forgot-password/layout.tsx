@@ -5,7 +5,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Mot de passe oublié",
   description:
-    "Réinitialisez votre mot de passe DarEstate pour retrouver l'accès à votre compte.",
+    "Besoin d'aide pour accéder à votre compte DarEstate ? Contactez le support.",
   path: "/forgot-password",
   index: false,
 });

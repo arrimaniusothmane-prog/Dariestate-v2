@@ -12,6 +12,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { media } from "@/lib/media";
 
 export const metadata = {
   title: "Espace Professionnel & Agences",
@@ -19,7 +20,7 @@ export const metadata = {
     "Rejoignez le réseau immobilier professionnel DarEstate au Maroc. Programme agences dédié, diffusion multi-canal, leads prioritaires et outils de gestion avancés.",
   alternates: {
     canonical: "/agent",
-    languages: { fr: "/agent", en: "/agent", ar: "/agent" },
+    languages: { fr: "/agent" },
   },
 };
 
@@ -66,9 +67,9 @@ export default function AgentPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-[65vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=2000&h=1300&fit=crop"
+          src={media.heroAgent}
           alt="Agence immobilière professionnelle moderne"
           fill
           priority
@@ -76,19 +77,18 @@ export default function AgentPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-              <ShieldCheck className="size-4 text-gold" /> Espace Professionnel
+              <ShieldCheck className="size-4 text-gold" /> Espace professionnel
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              Le réseau immobilier{" "}
-              <span className="font-serif italic text-gold">professionnel</span> au Maroc.
+              Une plateforme dédiée aux{" "}
+              <span className="font-serif italic text-gold">professionnels</span> de l&apos;immobilier.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
-              Agences et agents indépendants : développez votre activité avec
-              une plateforme performante, des leads qualifiés et un
-              accompagnement dédié.
+              Agences et agents indépendants : diffusez vos annonces, priorisez
+              vos demandes et pilotez votre activité depuis un espace unique.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/contact">
@@ -96,13 +96,13 @@ export default function AgentPage() {
                   Devenir partenaire <ArrowRight className="ml-2 size-4" />
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/contact">
                 <Button
                   size="lg"
                   variant="outline"
                   className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  Créer un compte pro
+                  Demander un accès professionnel
                 </Button>
               </Link>
             </div>
@@ -115,14 +115,13 @@ export default function AgentPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-              Nos avantages
+              Offre professionnelle
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
-              Tout pour faire grandir votre activité
+              Les outils pour structurer votre activité
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Un programme complet pensé pour les professionnels de
-              l&apos;immobilier au Maroc.
+              Un programme conçu pour les agences et agents indépendants au Maroc.
             </p>
           </div>
 
@@ -161,9 +160,9 @@ export default function AgentPage() {
             <span className="font-serif italic text-gold">1,5%</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Bénéficiez de conditions tarifaires avantageuses dès votre
-            adhésion au réseau professionnel DarEstate. Contactez-nous pour
-            une offre personnalisée selon votre volume d&apos;activité.
+            Des conditions tarifaires adaptées dès votre adhésion au réseau
+            professionnel DarEstate. Contactez-nous pour une offre selon votre
+            volume d&apos;activité.
           </p>
         </div>
       </section>
@@ -185,14 +184,14 @@ export default function AgentPage() {
                 Devenir partenaire <ArrowRight className="ml-2 size-4" />
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/contact">
               <Button
                 size="lg"
                 variant="outline"
                 className="rounded-full border-white/30 text-white hover:bg-white/10 hover:text-white"
               >
-                Créer un compte pro
-              </Button>
+                  Demander un accès professionnel
+                </Button>
             </Link>
           </div>
         </div>

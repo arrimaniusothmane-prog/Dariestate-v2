@@ -2,10 +2,30 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { User, UserRole } from "../types";
 import { mockUsers } from "../data/properties";
+import { hashPassword } from "./password";
 
-export const DEFAULT_PASSWORD = "demo1234";
-export const ADMIN_CONTROL_PASSWORD = "Othmane@123";
-export const ADMIN_CONTROL_EMAIL = "arrimaniusothmane@gmail.com";
+const FALLBACK_DEFAULT_PASSWORD = "demo1234";
+const FALLBACK_ADMIN_PASSWORD = "Othmane@123";
+
+export const DEFAULT_PASSWORD =
+  process.env.DARESTATE_DEFAULT_PASSWORD ?? FALLBACK_DEFAULT_PASSWORD;
+export const ADMIN_CONTROL_PASSWORD =
+  process.env.DARESTATE_ADMIN_PASSWORD ?? FALLBACK_ADMIN_PASSWORD;
+export const ADMIN_CONTROL_EMAIL = (
+  process.env.DARESTATE_ADMIN_EMAIL ?? "arrimaniusothmane@gmail.com"
+)
+  .trim()
+  .toLowerCase();
+
+if (
+  process.env.NODE_ENV === "production" &&
+  (!process.env.DARESTATE_ADMIN_PASSWORD ||
+    ADMIN_CONTROL_PASSWORD === FALLBACK_ADMIN_PASSWORD)
+) {
+  console.warn(
+    "[DarEstate] DARESTATE_ADMIN_PASSWORD non défini ou égal au mot de passe par défaut. Changez-le en production."
+  );
+}
 
 export type ServerUser = User & { password: string };
 
@@ -69,12 +89,19 @@ function seed(): ServerUser[] {
   const fromMock: ServerUser[] = mockUsers.map((u) => ({
     ...u,
     status: u.status ?? "ACTIF",
-    password:
-      u.email.toLowerCase() === ADMIN_CONTROL_EMAIL
+    password: hashPassword(
+      u.email.trim().toLowerCase() === ADMIN_CONTROL_EMAIL
         ? ADMIN_CONTROL_PASSWORD
-        : DEFAULT_PASSWORD,
+        : DEFAULT_PASSWORD
+    ),
   }));
-  return [...fromMock, ...extraSeed];
+  return [
+    ...fromMock,
+    ...extraSeed.map((u) => ({
+      ...u,
+      password: hashPassword(u.password || DEFAULT_PASSWORD),
+    })),
+  ];
 }
 
 function ensureDb(): void {

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import type { Property } from "@/types";
 import { LeadStatus } from "@/types";
-import { createLead, createVisit } from "@/services/leadService";
+import { createLead, createVisitRequest } from "@/services/leadService";
 import { useAuth } from "@/components/providers/auth-provider";
 import { createDemande } from "@/services/demandeService";
 import { DemandeType } from "@/types";
@@ -31,6 +31,7 @@ export function ContactSellerModal({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const [form, setForm] = useState({
     name: user?.name ?? "",
@@ -43,6 +44,7 @@ export function ContactSellerModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       await createDemande({
         type: DemandeType.CONTACT_BIEN,
@@ -56,33 +58,41 @@ export function ContactSellerModal({
           requestVisit: String(form.requestVisit),
         },
       });
-      const lead = await createLead({
-        propertyId: property.id,
-        buyerId: user?.id ?? "buyer-1",
-        sellerId: property.sellerId,
-        status: form.requestVisit
-          ? LeadStatus.VISIT_REQUESTED
-          : LeadStatus.NEW,
-        message: form.message,
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-      });
       if (form.requestVisit) {
-        await createVisit({
+        await createVisitRequest({
           propertyId: property.id,
-          leadId: lead.id,
+          sellerId: property.sellerId,
+          buyerId: user?.id,
+          status: LeadStatus.VISIT_REQUESTED,
+          message: form.message,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
           date: new Date().toISOString().split("T")[0],
           time: "10:00",
           numberOfVisitors: 1,
-          phone: form.phone,
+        });
+      } else {
+        await createLead({
+          propertyId: property.id,
+          buyerId: user?.id ?? "guest",
+          sellerId: property.sellerId,
+          status: LeadStatus.NEW,
           message: form.message,
-          status: LeadStatus.VISIT_REQUESTED,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
         });
       }
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'envoyer le message. Réessayez."
+      );
     } finally {
       setSubmitting(false);
-      setSubmitted(true);
     }
   };
 
@@ -119,6 +129,12 @@ export function ContactSellerModal({
             </DialogHeader>
 
             <div className="mt-5 space-y-4">
+              {error && (
+                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <p>{error}</p>
+                </div>
+              )}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="contact-name">Nom complet</Label>

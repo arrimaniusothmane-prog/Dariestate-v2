@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, Building2, Wallet, BedDouble } from "lucide-react";
+import { Search, MapPin, Wallet, BedDouble } from "lucide-react";
+import { IconApartment } from "@/components/brand/category-icons";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -83,7 +84,7 @@ export function HeroSearch() {
           />
           <Divider />
           <Field
-            icon={<Building2 className="size-4" />}
+            icon={<IconApartment className="size-4" />}
             label="Type de bien"
             value={type}
             onChange={setType}

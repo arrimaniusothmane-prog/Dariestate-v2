@@ -11,6 +11,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/dashboard-shell";
+import { BuyerGuard } from "@/components/auth/role-guard";
 
 const items: NavItem[] = [
   { label: "Vue d'ensemble", href: "/buyer", icon: LayoutDashboard },
@@ -24,8 +25,8 @@ const items: NavItem[] = [
 
 export default function BuyerLayout({ children }: { children: ReactNode }) {
   return (
-    <DashboardShell items={items} badge={items.length ? "2" : undefined}>
-      {children}
-    </DashboardShell>
+    <BuyerGuard>
+      <DashboardShell items={items}>{children}</DashboardShell>
+    </BuyerGuard>
   );
 }

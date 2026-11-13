@@ -74,6 +74,9 @@ export default function PublishPage() {
   const { user } = useAuth();
   const isSeller =
     user?.role === "SELLER" || user?.role === "AGENT" || user?.role === "ADMIN";
+  const publishHref = isSeller
+    ? "/seller/add"
+    : `/login?next=${encodeURIComponent("/seller/add")}`;
 
   return (
     <div>
@@ -89,12 +92,12 @@ export default function PublishPage() {
               <span className="font-serif italic text-gold">DarEstate</span>
             </h1>
             <p className="mt-4 text-muted-foreground sm:text-lg">
-              Mettez en vente votre appartement, villa ou terrain au Maroc en
-              quelques minutes. Gratuit, simple et sécurisé.
+              Déposez l&apos;annonce de votre appartement, villa ou terrain.
+              Publication sans frais, validation avant mise en ligne.
             </p>
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/seller/add">
+              <Link href={publishHref}>
                 <Button
                   size="lg"
                   className="rounded-full bg-gold text-white hover:bg-gold/90"
@@ -238,7 +241,7 @@ export default function PublishPage() {
           </div>
 
           <div className="mt-10 text-center">
-            <Link href="/seller/add">
+            <Link href={publishHref}>
               <Button
                 size="lg"
                 className="rounded-full bg-gold text-white hover:bg-gold/90"

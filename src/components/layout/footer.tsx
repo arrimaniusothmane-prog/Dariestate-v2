@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Building2, Share2, Globe, MessageCircle, Mail, Phone } from "lucide-react";
+import { Share2, Globe, Mail } from "lucide-react";
+import { BrandLogo } from "@/components/brand/logo";
 
 const sections = [
   {
@@ -49,12 +50,6 @@ const socials = [
     external: true,
   },
   {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    href: "https://wa.me/212522000000",
-    external: true,
-  },
-  {
     icon: Share2,
     label: "Partager DarEstate",
     href: "https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.darestimate.ma&text=DarEstate%20%E2%80%94%20Immobilier%20de%20confiance%20au%20Maroc",
@@ -75,14 +70,7 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-white/10">
-                <Building2 className="size-5 text-gold" />
-              </span>
-              <span className="font-display text-xl font-semibold">
-                Dar<span className="text-gold">Estate</span>
-              </span>
-            </Link>
+            <BrandLogo href="/" tone="onDark" size="md" />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
               La plateforme immobilière premium au Maroc. Des biens vérifiés,
               des propriétaires certifiés et un accompagnement complet pour vos
@@ -90,10 +78,14 @@ export function Footer() {
             </p>
             <div className="mt-6 space-y-2 text-sm text-white/60">
               <p className="flex items-center gap-2">
-                <Phone className="size-4 text-gold" /> +212 5 22 00 00 00
-              </p>
-              <p className="flex items-center gap-2">
                 <Mail className="size-4 text-gold" /> contact@darestimate.ma
+              </p>
+              <p>
+                Ou via notre{" "}
+                <Link href="/contact" className="text-gold underline-offset-2 hover:underline">
+                  formulaire de contact
+                </Link>
+                .
               </p>
             </div>
           </div>

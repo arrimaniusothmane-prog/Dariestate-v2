@@ -9,9 +9,10 @@ import {
   ShieldCheck,
   BadgeCheck,
 } from "lucide-react";
-import { getProperties } from "@/services/propertyService";
+import { listProperties } from "@/server/properties";
 import { PropertyCard } from "@/components/property/property-card";
 import { Button } from "@/components/ui/button";
+import { media } from "@/lib/media";
 
 export const metadata = {
   title: "Acheter un bien immobilier au Maroc",
@@ -20,36 +21,36 @@ export const metadata = {
 };
 
 export default async function BuyPage() {
-  const properties = await getProperties();
+  const properties = listProperties();
   const featured = properties.filter((p) => p.isVerified).slice(0, 3);
 
   const steps = [
     {
       icon: Search,
-      title: "Trouvez le bien idéal",
+      title: "Sélectionnez un bien",
       description:
-        "Explorez notre sélection de biens vérifiés et utilisez des filtres précis pour affiner votre recherche.",
+        "Consultez des annonces vérifiées et affinez votre recherche avec des critères précis : ville, budget, surface, typologie.",
     },
     {
       icon: CalendarCheck2,
-      title: "Organisez vos visites",
+      title: "Planifiez les visites",
       description:
-        "Demandez une visite en un clic. Notre équipe vous accompagne et organise le rendez-vous avec le vendeur.",
+        "Soumettez une demande de visite. Un conseiller coordonne le rendez-vous avec le vendeur et vous accompagne si besoin.",
     },
     {
       icon: FileCheck,
-      title: "Négociez et finalisez",
+      title: "Négociez et concluez",
       description:
-        "Faites une offre, négociez en toute transparence et finalisez votre achat avec l'appui de nos conseillers.",
+        "Formulez une offre, conduisez la négociation en toute transparence et finalisez l'achat avec l'appui de nos équipes.",
     },
   ];
 
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-[70vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=2000&h=1300&fit=crop"
+          src={media.heroBuy}
           alt="Appartement lumineux moderne"
           fill
           priority
@@ -57,33 +58,33 @@ export default async function BuyPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-              <ShieldCheck className="size-4 text-gold" /> Achat accompagné
+              <ShieldCheck className="size-4 text-gold" /> Accompagnement à l&apos;achat
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              Votre futur chez-vous,{" "}
-              <span className="font-serif italic text-gold">trouvé simplement.</span>
+              Achetez en confiance{" "}
+              <span className="font-serif italic text-gold">sur le marché marocain.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
-              Appartements, villas, terrains ou locaux commerciaux : découvrez
-              des biens vérifiés dans tout le Maroc, avec un accompagnement
-              personnalisé de la visite à la signature.
+              Appartements, villas, terrains et locaux commerciaux vérifiés.
+              Un accompagnement structuré, de la visite jusqu&apos;à la
+              signature.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/properties">
                 <Button size="lg" className="rounded-full bg-gold text-white hover:bg-gold/90">
-                  Parcourir les biens <ArrowRight className="ml-2 size-4" />
+                  Voir les biens <ArrowRight className="ml-2 size-4" />
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/contact">
                 <Button
                   size="lg"
                   variant="outline"
                   className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  Créer mon compte
+                  Prendre contact
                 </Button>
               </Link>
             </div>
@@ -95,9 +96,9 @@ export default async function BuyPage() {
       <section className="border-b border-border/60 bg-sand/50">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-3 sm:px-6 lg:px-8">
           {[
-            { icon: BadgeCheck, text: "Biens et propriétaires vérifiés" },
-            { icon: CalendarCheck2, text: "Visites organisées par nos soins" },
-            { icon: ShieldCheck, text: "Transaction sécurisée et accompagnée" },
+            { icon: BadgeCheck, text: "Biens et propriétaires contrôlés" },
+            { icon: CalendarCheck2, text: "Visites coordonnées par nos équipes" },
+            { icon: ShieldCheck, text: "Transaction suivie jusqu'à la signature" },
           ].map((item) => {
             const Icon = item.icon;
             return (
@@ -117,13 +118,13 @@ export default async function BuyPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-              Comment ça marche
+              Parcours d&apos;achat
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
-              Acheter avec DarEstate
+              Un processus clair et accompagné
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Trois étapes simples et un accompagnement humain à chaque moment clé.
+              Trois étapes structurées, avec un interlocuteur DarEstate à chaque étape clé.
             </p>
           </div>
 
@@ -163,7 +164,7 @@ export default async function BuyPage() {
                 Pour commencer
               </span>
               <h2 className="mt-3 font-display text-3xl font-semibold">
-                Nos biens coups de cœur
+                Sélection de biens vérifiés
               </h2>
             </div>
             <Link href="/properties" className="flex items-center gap-1 text-sm font-medium text-gold hover:underline">
@@ -183,21 +184,21 @@ export default async function BuyPage() {
         <div className="mx-auto max-w-4xl rounded-3xl bg-ink px-6 py-14 text-center sm:px-12">
           <Heart className="mx-auto size-8 text-gold" />
           <h2 className="mt-4 font-display text-3xl font-semibold text-white">
-            Enregistrez vos biens préférés
+            Constituez votre sélection
           </h2>
           <p className="mx-auto mt-3 max-w-md text-white/70">
-            Créez votre liste de favoris et soyez notifié dès qu&apos;un bien
-            correspond à vos critères.
+            Enregistrez vos biens favoris et suivez les annonces qui
+            correspondent à vos critères.
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link href="/register">
+            <Link href={`/login?next=${encodeURIComponent("/buyer/favorites")}`}>
               <Button size="lg" className="rounded-full bg-gold text-white hover:bg-gold/90">
-                Commencer gratuitement
+                Se connecter
               </Button>
             </Link>
-            <Link href="/buyer/favorites">
+            <Link href="/contact">
               <Button size="lg" variant="outline" className="rounded-full border-white/30 text-white hover:bg-white/10 hover:text-white">
-                Voir mes favoris
+                Demander un accès
               </Button>
             </Link>
           </div>

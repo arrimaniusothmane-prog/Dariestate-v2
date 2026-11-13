@@ -9,6 +9,7 @@ import { formatPrice, cn } from "@/lib/utils";
 import { categoryLabel } from "@/lib/labels";
 import { useFavorites } from "@/hooks/useProperties";
 import { Badge } from "@/components/ui/badge";
+import { categoryIcon } from "@/components/brand/category-icons";
 
 export function PropertyCard({
   property,
@@ -57,7 +58,11 @@ export function PropertyCard({
         </Link>
 
         {/* Category badge */}
-        <Badge className="pointer-events-none absolute left-3 top-3 bg-black/40 text-white backdrop-blur-md hover:bg-black/50">
+        <Badge className="pointer-events-none absolute left-3 top-3 gap-1.5 bg-black/40 text-white backdrop-blur-md hover:bg-black/50">
+          {(() => {
+            const Icon = categoryIcon[property.category];
+            return <Icon className="size-3.5" />;
+          })()}
           {categoryLabel[property.category]}
         </Badge>
 

@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { media } from "@/lib/media";
 
 export const metadata = {
   title: "À propos de DarEstate",
@@ -17,7 +18,7 @@ export const metadata = {
     "DarEstate, la marketplace immobilière de confiance au Maroc. Découvrez notre mission, nos valeurs et l'histoire de notre plateforme.",
   alternates: {
     canonical: "/about",
-    languages: { fr: "/about", en: "/about", ar: "/about" },
+    languages: { fr: "/about" },
   },
 };
 
@@ -32,7 +33,7 @@ const values = [
     icon: Handshake,
     title: "Confiance",
     description:
-      "Propriétaires et biens vérifiés, annonces contrôlées : nous bâtons une relation de confiance durable avec chacun.",
+      "Propriétaires et biens vérifiés, annonces contrôlées : nous bâtissons une relation de confiance durable avec chacun.",
   },
   {
     icon: Gem,
@@ -49,10 +50,10 @@ const values = [
 ];
 
 const stats = [
-  { value: "+12 000", label: "visiteurs / mois" },
-  { value: "1 500", label: "annonces actives" },
-  { value: "4.9/5", label: "satisfaction" },
-  { value: "98%", label: "annonces vérifiées" },
+  { value: "12", label: "biens en ligne" },
+  { value: "10", label: "annonces vérifiées" },
+  { value: "3", label: "villes principales" },
+  { value: "100%", label: "annonces contrôlées" },
 ];
 
 const timeline = [
@@ -66,13 +67,13 @@ const timeline = [
     year: "2025",
     title: "Couverture nationale",
     description:
-      "La plateforme s'étend aux grandes villes du royaume et passe le cap des 1 500 annonces actives.",
+      "La plateforme s'étend aux grandes villes du royaume — Casablanca, Marrakech, Rabat — avec une sélection exigeante.",
   },
   {
     year: "2026",
-    title: "Support AR / FR",
+    title: "Parcours complets",
     description:
-      "Une expérience bilingue arabe et français pour servir tous les investisseurs et futurs propriétaires.",
+      "Achat, vente et travaux réunis sur une même plateforme, avec un accompagnement de la visite à la signature.",
   },
 ];
 
@@ -80,9 +81,9 @@ export default function AboutPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-[60vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2000&h=1300&fit=crop"
+          src={media.heroAbout}
           alt="Accueil moderne d'une propriété premium DarEstate"
           fill
           priority
@@ -90,18 +91,18 @@ export default function AboutPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-20 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-              <Sparkles className="size-4 text-gold" /> Notre histoire
+              <Sparkles className="size-4 text-gold" /> À propos
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              DarEstate, la marketplace immobilière{" "}
-              <span className="font-serif italic text-gold">de confiance</span> au Maroc.
+              DarEstate structure le marché immobilier{" "}
+              <span className="font-serif italic text-gold">premium</span> au Maroc.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
-              Nous connectons acheteurs, investisseurs et professionnels avec
-              des biens vérifiés et un accompagnement humain à chaque étape.
+              Nous réunissons acheteurs, investisseurs et professionnels autour
+              de biens vérifiés et d&apos;un accompagnement sérieux à chaque étape.
             </p>
           </div>
         </div>
@@ -115,41 +116,40 @@ export default function AboutPage() {
               Notre mission
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
-              Rendre l&apos;immobilier simple et fiable
+              Rendre l&apos;immobilier plus fiable et plus lisible
             </h2>
           </div>
           <div className="mx-auto mt-10 grid max-w-4xl gap-8 md:grid-cols-2">
             <div className="rounded-2xl border border-border/60 bg-card p-7">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Le marché immobilier marocain souffrait de pratiques peu
-                transparentes et d&apos;une expérience fragmentée. DarEstate est né
-                d&apos;une conviction simple : trouver ou vendre un bien doit être
-                aussi clair que fiable.
+                Le marché immobilier marocain manquait souvent de lisibilité et
+                de continuité dans l&apos;accompagnement. DarEstate a été conçu
+                pour offrir un parcours plus clair : annonces contrôlées,
+                interlocuteurs identifiés, suivi jusqu&apos;à la signature.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Nous avons bâti une plateforme où chaque annonce est vérifiée,
-                chaque propriétaire est identifié et chaque transaction est
-                accompagnée par des conseillers dédiés. Notre priorité absolue :
-                la confiance.
+                Notre plateforme réunit acheteurs, vendeurs et professionnels
+                autour de biens vérifiés et d&apos;un accompagnement dédié à
+                chaque étape du projet.
               </p>
             </div>
             <div className="flex flex-col justify-center gap-6 rounded-2xl bg-ink p-7 text-white">
               <div>
                 <p className="font-display text-2xl font-semibold text-gold">2%</p>
                 <p className="mt-1 text-sm text-white/70">
-                  commission de succès uniquement, à la vente finalisée.
+                  commission au succès, uniquement à la vente finalisée.
                 </p>
               </div>
               <div>
-                <p className="font-display text-2xl font-semibold text-gold">98%</p>
+                <p className="font-display text-2xl font-semibold text-gold">100%</p>
                 <p className="mt-1 text-sm text-white/70">
-                  des annonces sont vérifiées avant publication.
+                  des annonces contrôlées avant mise en ligne.
                 </p>
               </div>
               <div>
-                <p className="font-display text-2xl font-semibold text-gold">24/7</p>
+                <p className="font-display text-2xl font-semibold text-gold">1</p>
                 <p className="mt-1 text-sm text-white/70">
-                  un accompagnement humain sur tout le territoire.
+                  interlocuteur dédié pour suivre votre dossier.
                 </p>
               </div>
             </div>
@@ -251,13 +251,13 @@ export default function AboutPage() {
                 Nous contacter
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/login">
               <Button
                 size="lg"
                 variant="outline"
                 className="rounded-full border-white/30 text-white hover:bg-white/10 hover:text-white"
               >
-                Créer un compte <ArrowRight className="ml-2 size-4" />
+                Se connecter <ArrowRight className="ml-2 size-4" />
               </Button>
             </Link>
           </div>

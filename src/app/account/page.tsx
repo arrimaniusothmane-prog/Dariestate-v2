@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -9,15 +10,12 @@ import {
   ShieldCheck,
   ArrowRight,
   LogOut,
-  Heart,
-  FileText,
-  Eye,
-  Star,
   Lock,
   UserRoundCog,
 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
+import { getFavorites, getOffers } from "@/services/leadService";
 
 const accessCards = [
   {
@@ -51,16 +49,31 @@ const profileHrefByRole: Record<string, string> = {
   BUYER: "/buyer/profile",
 };
 
-const quickStats = [
-  { icon: Heart, label: "Favoris", value: "4" },
-  { icon: FileText, label: "Demandes", value: "6" },
-  { icon: Eye, label: "Visites", value: "3" },
-  { icon: Star, label: "Offres", value: "2" },
-];
-
 export default function AccountPage() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const [stats, setStats] = useState({
+    favorites: 0,
+    offers: 0,
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    let ignore = false;
+    Promise.all([
+      getFavorites(user.id).catch(() => [] as string[]),
+      getOffers().catch(() => [] as { buyerId?: string }[]),
+    ]).then(([favorites, offers]) => {
+      if (ignore) return;
+      setStats({
+        favorites: favorites.length,
+        offers: offers.filter((o) => o.buyerId === user.id).length,
+      });
+    });
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -78,7 +91,6 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-pretty font-display text-3xl font-semibold sm:text-4xl">
           {user ? `Bonjour, ${user.name.split(" ")[0]}.` : "Votre compte"}
@@ -86,34 +98,42 @@ export default function AccountPage() {
         <p className="mt-3 text-muted-foreground">
           {user
             ? "Gérez vos espaces et vos informations depuis un seul endroit."
-            : "Connectez-vous pour accéder à votre espace personnel sur mobile et desktop."}
+            : "Connectez-vous pour accéder à votre espace personnel."}
         </p>
       </div>
 
       {!user ? (
-        /* Guest state */
         <div className="mx-auto mt-10 flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-border/60 bg-card p-8 text-center shadow-sm">
           <span className="flex size-16 items-center justify-center rounded-full bg-gold/15">
             <Lock className="size-8 text-gold-strong" />
           </span>
           <div>
             <p className="font-display text-xl font-semibold">
-              Accès réservé à l&apos;administrateur
+              Connexion requise
             </p>
             <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-              La création de comptes est actuellement fermée. Connectez-vous
-              avec le compte administrateur pour accéder au tableau de bord.
+              Les inscriptions sont actuellement sur invitation. Connectez-vous
+              avec votre compte, ou contactez-nous pour demander un accès.
             </p>
           </div>
-          <Link href="/login" className="w-full sm:w-auto">
-            <Button className="w-full rounded-full px-8 py-6 sm:w-auto">
-              Se connecter <ArrowRight className="ml-2 size-4" />
-            </Button>
-          </Link>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <Link href="/login" className="w-full sm:w-auto">
+              <Button className="w-full rounded-full px-8 py-6 sm:w-auto">
+                Se connecter <ArrowRight className="ml-2 size-4" />
+              </Button>
+            </Link>
+            <Link href="/contact" className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                className="w-full rounded-full px-8 py-6 sm:w-auto"
+              >
+                Demander un accès
+              </Button>
+            </Link>
+          </div>
         </div>
       ) : (
         <>
-          {/* Greeting */}
           <div className="mx-auto mt-10 flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-border/60 bg-card p-8 text-center shadow-sm">
             <div className="flex size-16 items-center justify-center rounded-full bg-gold/15">
               <User className="size-8 text-gold-strong" />
@@ -130,7 +150,6 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* Access cards */}
           <div className="mx-auto mt-10 grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((card) => {
               const Icon = card.icon;
@@ -154,7 +173,6 @@ export default function AccountPage() {
               );
             })}
 
-            {/* Profile shortcut */}
             <Link
               href={profileHrefByRole[user.role] ?? "/buyer/profile"}
               className="group h-full"
@@ -177,28 +195,25 @@ export default function AccountPage() {
             </Link>
           </div>
 
-          {/* Quick stats */}
-          <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
-            {quickStats.map((stat) => {
-              const Icon = stat.icon;
-              return (
+          {user.role === "BUYER" && (
+            <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4">
+              {[
+                { label: "Favoris", value: stats.favorites },
+                { label: "Offres", value: stats.offers },
+              ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3"
+                  className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-center"
                 >
-                  <Icon className="size-5 text-gold-strong" />
-                  <div>
-                    <p className="tnum font-display text-lg font-semibold">
-                      {stat.value}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
+                  <p className="tnum font-display text-lg font-semibold">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
 
-          {/* Logout */}
           <div className="mx-auto mt-12 max-w-4xl text-center">
             <Button
               variant="destructive"

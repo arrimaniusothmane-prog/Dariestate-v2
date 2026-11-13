@@ -20,27 +20,27 @@ export const metadata = {
 const benefits = [
   {
     icon: Upload,
-    title: "Publication en quelques minutes",
+    title: "Publication structurée",
     description:
-      "Publiez votre bien en 7 étapes simples avec photos et description. Votre annonce est visible dès validation.",
+      "Déposez votre annonce en quelques étapes : photos, descriptif et caractéristiques. Elle est mise en ligne après validation.",
   },
   {
     icon: Users,
-    title: "Leads qualifiés",
+    title: "Demandes qualifiées",
     description:
-      "Recevez uniquement des demandes sérieuses : contacts, demandes de visite et offres, organisées dans votre espace vendeur.",
+      "Centralisez contacts, demandes de visite et offres dans votre espace vendeur, pour traiter uniquement les dossiers sérieux.",
   },
   {
     icon: CalendarCheck2,
-    title: "Visites organisées",
+    title: "Visites coordonnées",
     description:
-      "Un conseiller DarEstate orchestre vos visites et vous prépare un planning clair, pour vous concentrer sur l'essentiel.",
+      "Un conseiller DarEstate organise le planning des visites et assure le suivi avec les acheteurs intéressés.",
   },
   {
     icon: HandCoins,
-    title: "Commission de succès seulement",
+    title: "Rémunération au succès",
     description:
-      "Aucun frais de publication. DarEstate ne perçoit qu'une commission sur les ventes finalisées — 2% en moyenne.",
+      "Aucun frais de publication. DarEstate perçoit une commission uniquement sur les ventes finalisées — 2 % en moyenne.",
   },
 ];
 
@@ -48,7 +48,7 @@ export default function SellPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-[70vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2000&h=1300&fit=crop"
           alt="Maison moderne à vendre"
@@ -58,19 +58,19 @@ export default function SellPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-              <ShieldCheck className="size-4 text-gold" /> Publication gratuite
+              <ShieldCheck className="size-4 text-gold" /> Sans frais de publication
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              Vendez mieux,{" "}
-              <span className="font-serif italic text-gold">plus vite.</span>
+              Vendez votre bien{" "}
+              <span className="font-serif italic text-gold">dans les meilleures conditions.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
-              Propriétaires, agences et professionnels : publiez vos biens,
-              gérez vos leads et finalisez vos transactions avec une plateforme
-              pensée pour la vente.
+              Propriétaires et professionnels : publiez votre annonce, recevez
+              des demandes qualifiées et conduisez la transaction avec un
+              accompagnement dédié.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/seller/add">
@@ -80,7 +80,7 @@ export default function SellPage() {
               </Link>
               <Link href="/seller">
                 <Button size="lg" variant="outline" className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                  Découvrir l&apos;espace vendeur
+                  Accéder à l&apos;espace vendeur
                 </Button>
               </Link>
             </div>
@@ -93,10 +93,10 @@ export default function SellPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-              Pourquoi vendre ici
+              Avantages vendeur
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
-              Une plateforme conçue pour la performance
+              Une plateforme conçue pour vendre efficacement
             </h2>
           </div>
 
@@ -161,9 +161,8 @@ export default function SellPage() {
 
           <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/70">
             <TrendingUp className="size-5 shrink-0 text-gold" />
-            Votre bien vendu, c&apos;est notre réussite. C&apos;est pourquoi nous
-            investissons dans la visibilité de vos annonces et la qualité des
-            acheteurs.
+            Notre rémunération dépend de la vente finalisée : nous concentrons
+            nos efforts sur la qualité des annonces et des acheteurs.
           </div>
         </div>
       </section>
@@ -173,14 +172,14 @@ export default function SellPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-semibold">
-              En route vers la vente
+              Le parcours de vente
             </h2>
           </div>
           <div className="mt-10 flex flex-col gap-8 md:flex-row md:items-start">
             {[
-              { n: "1", t: "Publiez", d: "Photos, description, prix : votre annonce en ligne est prête." },
-              { n: "2", t: "Recevez des leads", d: "Demandes de contact, visites et offres arrivent dans votre tableau de bord." },
-              { n: "3", t: "Finalisez", d: "Négociez, signez et concluez avec l'appui de nos conseillers." },
+              { n: "1", t: "Publiez", d: "Photos, descriptif et prix : votre annonce est mise en ligne après validation." },
+              { n: "2", t: "Recevez des demandes", d: "Contacts, visites et offres sont centralisés dans votre tableau de bord." },
+              { n: "3", t: "Finalisez", d: "Négociez et concluez la vente avec l'appui de nos conseillers." },
             ].map((s) => (
               <div key={s.n} className="relative flex-1 rounded-2xl border border-border/60 bg-card p-6 text-center">
                 <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-gold font-display text-lg font-bold text-white">
@@ -195,7 +194,7 @@ export default function SellPage() {
           <div className="mt-12 text-center">
             <Link href="/seller/add">
               <Button size="lg" className="rounded-full">
-                Publier mon bien maintenant <ArrowRight className="ml-2 size-4" />
+                Publier mon bien <ArrowRight className="ml-2 size-4" />
               </Button>
             </Link>
           </div>

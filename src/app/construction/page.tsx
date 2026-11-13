@@ -23,7 +23,6 @@ import {
   CircleDollarSign,
   MapPin,
   Ruler,
-  Phone,
   Mail,
   Star,
   Sparkles,
@@ -32,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { DevisForm } from "@/components/forms/devis-form";
 import { RealizationsGallery } from "@/components/sections/realizations-gallery";
 import { cn } from "@/lib/utils";
+import { media } from "@/lib/media";
 
 export const metadata = {
   title: "Construction, Rénovation & Agencement au Maroc",
@@ -39,7 +39,7 @@ export const metadata = {
     "Construction de villas, rénovation d'appartements et agencement intérieur : une équipe unique pour votre projet, de la conception à la livraison. Devis gratuit.",
   alternates: {
     canonical: "/construction",
-    languages: { fr: "/construction", en: "/construction", ar: "/construction" },
+    languages: { fr: "/construction" },
   },
 };
 
@@ -55,9 +55,8 @@ const projectKinds = [
   "Espaces sur mesure",
 ];
 
-// Statistiques d'illustration — à remplacer par vos chiffres réels.
 const stats = [
-  { value: "+120", label: "Projets accompagnés" },
+  { value: "3", label: "Pôles métiers" },
   { value: "12", label: "Corps de métier intégrés" },
   { value: "100%", label: "Chantiers suivis de A à Z" },
   { value: "48h", label: "Délai de réponse devis" },
@@ -123,8 +122,7 @@ const activities = [
     number: "03",
     icon: LayoutTemplate,
     title: "Agencement",
-    image:
-      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=800&fit=crop",
+    image: "/images/construction/cuisine-minimaliste.jpg",
     description:
       "Nous concevons et réalisons des espaces intérieurs adaptés à l'identité et aux besoins de chaque client.",
     prestations: [
@@ -158,8 +156,7 @@ const expertise = [
   {
     title: "Second œuvre",
     description: "Agencement intérieur et finitions des volumes.",
-    image:
-      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop",
+    image: "/images/construction/cuisine-blanche.jpg",
   },
   {
     title: "Maçonnerie",
@@ -182,14 +179,12 @@ const expertise = [
   {
     title: "Menuiserie",
     description: "Portes, fenêtres, parquets et ouvrages sur mesure.",
-    image:
-      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&h=400&fit=crop",
+    image: "/images/construction/menuiserie-atelier.jpg",
   },
   {
     title: "Cuisine",
     description: "Conception et installation de cuisines équipées.",
-    image:
-      "https://images.unsplash.com/photo-1556912173-3bb406ef7e77?w=600&h=400&fit=crop",
+    image: "/images/construction/cuisine-ilot.jpg",
   },
   {
     title: "Salle de bain",
@@ -218,8 +213,7 @@ const expertise = [
   {
     title: "Agencement",
     description: "Aménagements intérieurs fonctionnels et esthétiques.",
-    image:
-      "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&h=400&fit=crop",
+    image: "/images/construction/dressing-sur-mesure.jpg",
   },
   {
     title: "Pergola",
@@ -272,8 +266,7 @@ const steps = [
     title: "Conception",
     description:
       "Nous définissons les solutions, matériaux, finitions et choix d'aménagement.",
-    image:
-      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=560&fit=crop",
+    image: "/images/construction/cuisine-noire-mate.jpg",
   },
   {
     number: "04",
@@ -334,8 +327,7 @@ const reasons = [
     title: "Sur mesure",
     description:
       "Chaque projet est adapté aux besoins et aux contraintes du client.",
-    image:
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=560&fit=crop",
+    image: "/images/construction/cuisine-sauge.jpg",
   },
   {
     icon: TrendingUp,
@@ -424,9 +416,9 @@ export default function ConstructionPage() {
   return (
     <div>
       {/* ============ HERO ============ */}
-      <section className="relative flex min-h-[78vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=2000&h=1300&fit=crop"
+          src={media.heroConstruction}
           alt="Chantier de construction DarEstate"
           fill
           priority
@@ -434,21 +426,19 @@ export default function ConstructionPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/35" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
               <HardHat className="size-4 text-gold" /> Construction · Rénovation
               · Agencement
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-6xl">
-              Votre projet,{" "}
-              <span className="font-serif italic text-gold">de A à Z</span>,
-              clé en main.
+              Construction, rénovation et agencement,{" "}
+              <span className="font-serif italic text-gold">maîtrisés de bout en bout.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-white/85">
-              Nous accompagnons particuliers et professionnels dans la
-              réalisation de leurs projets de construction, rénovation et
-              agencement — de la conception à la livraison.
+              Particuliers et professionnels : une équipe unique pour concevoir,
+              réaliser et livrer votre projet — de l&apos;étude à la réception.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="#devis">
@@ -465,7 +455,7 @@ export default function ConstructionPage() {
                   variant="outline"
                   className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  Découvrir nos réalisations
+                  Voir nos réalisations
                 </Button>
               </Link>
             </div>
@@ -659,7 +649,7 @@ export default function ConstructionPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Notre méthode"
-            title="Un accompagnement de A à Z"
+            title="Un accompagnement structuré"
             lead="Six étapes claires, une équipe dédiée et un suivi rigoureux du premier rendez-vous jusqu'à la livraison."
             dark
           />
@@ -709,7 +699,7 @@ export default function ConstructionPage() {
           <SectionHeading
             eyebrow="Pourquoi nous choisir"
             title="Une seule équipe pour votre projet"
-            lead="Dans la qualité, l'accompagnement et la transparence : tout est pensé pour simplifier votre projet."
+            lead="Qualité d'exécution, suivi de chantier et transparence : un cadre clair du devis à la réception."
           />
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -802,8 +792,8 @@ export default function ConstructionPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SectionHeading
             eyebrow="Témoignages"
-            title="La satisfaction de nos clients est notre priorité"
-            lead="Leurs mots valent mieux que tout discours. Les avis de nos clients seront publiés ici dès leur réception."
+            title="Avis clients"
+            lead="Les témoignages de nos clients seront publiés ici dès leur réception."
           />
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -874,11 +864,11 @@ export default function ConstructionPage() {
                 Devis gratuit
               </span>
               <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
-                Un projet de construction, rénovation ou agencement ?
+                Demandez une étude pour votre projet
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Parlons de votre projet. Réponse sous 48h, devis gratuit et
-                sans engagement.
+                Décrivez votre besoin : réponse sous 48h, devis gratuit et sans
+                engagement.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -897,20 +887,7 @@ export default function ConstructionPage() {
                 </Link>
               </div>
 
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-border/60 bg-card p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold">
-                      <Phone className="size-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Appelez-nous
-                      </p>
-                      <p className="text-sm font-semibold">+212 5 22 00 00 00</p>
-                    </div>
-                  </div>
-                </div>
+              <div className="mt-8">
                 <div className="rounded-2xl border border-border/60 bg-card p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex size-10 items-center justify-center rounded-xl bg-gold/15 text-gold">

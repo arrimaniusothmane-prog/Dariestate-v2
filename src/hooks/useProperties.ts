@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Property, PropertyFilters, UserRole } from "../types";
+import { Property, PropertyFilters } from "../types";
 import {
   getProperties as fetchProperties,
   getPropertyBySlug,
@@ -86,16 +86,26 @@ export function useSearchProperties(filters: PropertyFilters) {
 
 export function useFavorites(userIdArg?: string) {
   const { user } = useAuth();
-  const userId =
-    userIdArg ?? (user?.role === UserRole.BUYER ? user.id : "buyer-1");
+  const userId = userIdArg ?? user?.id;
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let ignore = false;
+    if (!userId) {
+      setFavorites([]);
+      setLoading(false);
+      return () => {
+        ignore = true;
+      };
+    }
+    setLoading(true);
     fetchFavorites(userId)
       .then((list) => {
         if (!ignore) setFavorites(list);
+      })
+      .catch(() => {
+        if (!ignore) setFavorites([]);
       })
       .finally(() => {
         if (!ignore) setLoading(false);
@@ -106,6 +116,10 @@ export function useFavorites(userIdArg?: string) {
   }, [userId]);
 
   const toggleFavorite = async (propertyId: string) => {
+    if (!userId) {
+      window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
     const updated = await toggleFav(userId, propertyId);
     setFavorites(updated);
   };

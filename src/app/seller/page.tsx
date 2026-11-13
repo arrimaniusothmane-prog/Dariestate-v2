@@ -13,7 +13,6 @@ import {
 import type { Property, Lead } from "@/types";
 import { getProperties } from "@/services/propertyService";
 import { getLeads, getVisits, getOffers } from "@/services/leadService";
-import { mockProperties } from "@/data/properties";
 import { DashboardHeader, StatCard } from "@/components/dashboard/dashboard-shell";
 import { PropertyCard } from "@/components/property/property-card";
 import { Badge } from "@/components/ui/badge";
@@ -101,14 +100,14 @@ export default function SellerOverviewPage() {
 
   const propertyTitle = useCallback(
     (propertyId: string) =>
-      mockProperties.find((p) => p.id === propertyId)?.title ?? "Bien",
-    []
+      properties.find((p) => p.id === propertyId)?.title ?? "Bien",
+    [properties]
   );
 
   const propertySlug = useCallback(
     (propertyId: string) =>
-      mockProperties.find((p) => p.id === propertyId)?.slug,
-    []
+      properties.find((p) => p.id === propertyId)?.slug,
+    [properties]
   );
 
   const recentListings = [...properties]

@@ -8,12 +8,14 @@ import {
   HardHat,
   ShieldCheck,
 } from "lucide-react";
-import { getProperties } from "@/services/propertyService";
+import { listProperties } from "@/server/properties";
 import { HeroSearch } from "@/components/sections/hero-search";
 import { FeaturedProperties } from "@/components/sections/featured-properties";
+import { categoryIcon } from "@/components/brand/category-icons";
 import { PropertyCategory } from "@/types";
 import { Button } from "@/components/ui/button";
 import { pageMetadata } from "@/lib/seo";
+import { categoryMedia, media } from "@/lib/media";
 
 export const metadata = pageMetadata({
   title: "DarEstate — Le marché immobilier premium au Maroc",
@@ -35,7 +37,7 @@ const categories: {
 ];
 
 export default async function HomePage() {
-  const properties = await getProperties();
+  const properties = listProperties();
   const verified = properties.filter((p) => p.isVerified).length;
   const cities = new Set(properties.map((p) => p.address.city)).size;
   const countByCategory = (value: PropertyCategory) =>
@@ -44,10 +46,10 @@ export default async function HomePage() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative flex min-h-[94svh] items-end overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-end overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=2400&h=1600&fit=crop"
-          alt="Villa moderne baignée de lumière dorée au Maroc"
+          src={media.heroHome}
+          alt="Villa contemporaine baignée de lumière dorée au Maroc"
           fill
           priority
           sizes="100vw"
@@ -59,13 +61,13 @@ export default async function HomePage() {
           {/* Headline — the single visual statement */}
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-hero text-balance text-white">
-              Trouvez un bien qui vaut la peine{" "}
-              <span className="italic text-gold">d&apos;être appelé maison.</span>
+              L&apos;immobilier premium,{" "}
+              <span className="italic text-gold">sélectionné et accompagné.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-pretty text-base text-white/80 sm:text-lg">
-              Appartements, villas et terrains sélectionnés — Casablanca,
-              Marrakech, Rabat. Des biens vérifiés, un accompagnement de la
-              visite à la signature.
+              Appartements, villas et terrains vérifiés à Casablanca, Marrakech
+              et Rabat. Un parcours clair, de la première visite jusqu&apos;à
+              la signature.
             </p>
           </div>
 
@@ -79,7 +81,14 @@ export default async function HomePage() {
             <Stat value={String(properties.length)} label="Biens en ligne" />
             <Stat value={String(verified)} label="Annonces vérifiées" />
             <Stat value={String(cities)} label="Villes couvertes" />
-            <Stat value="4.9/5" label="Note moyenne acheteurs" />
+            <Stat
+              value={
+                properties.length
+                  ? `${Math.round((verified / properties.length) * 100)}%`
+                  : "—"
+              }
+              label="Taux de vérification"
+            />
           </div>
         </div>
       </section>
@@ -87,8 +96,8 @@ export default async function HomePage() {
       {/* FEATURED */}
       <FeaturedProperties />
 
-      {/* CATEGORIES — editorial index */}
-      <section className="border-y border-line bg-sand/50 py-20">
+      {/* CATEGORIES — visual index */}
+      <section id="categories" className="border-y border-line bg-sand/50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-2">
             <h2 className="font-display text-3xl font-semibold sm:text-4xl">
@@ -99,29 +108,44 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="divide-y divide-border/70 border-y border-border/70">
-            {categories.map((c) => (
-              <Link
-                key={c.value}
-                href={`/properties?category=${c.value}`}
-                className="group flex items-center justify-between gap-6 py-6 transition-colors sm:py-8"
-              >
-                <div className="min-w-0">
-                  <h3 className="font-display text-2xl font-semibold transition-colors group-hover:text-gold-strong sm:text-3xl">
-                    {c.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{c.description}</p>
-                </div>
-                <div className="flex shrink-0 items-center gap-4">
-                  <span className="tnum text-sm font-medium text-muted-foreground">
-                    {countByCategory(c.value)} biens
-                  </span>
-                  <span className="flex size-11 items-center justify-center rounded-full border border-border bg-card transition-all duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-ink">
-                    <ArrowUpRight className="size-5" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {categories.map((c) => {
+              const Icon = categoryIcon[c.value];
+              const shot = categoryMedia[c.value];
+              return (
+                <Link
+                  key={c.value}
+                  href={`/properties?category=${c.value}`}
+                  className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card"
+                >
+                  <div className="relative aspect-[5/4] overflow-hidden">
+                    <Image
+                      src={shot.image}
+                      alt={shot.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                    <span className="absolute left-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md">
+                      <Icon className="size-5" />
+                    </span>
+                    <span className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border border-white/25 bg-black/25 text-white backdrop-blur-md transition-colors group-hover:border-gold group-hover:bg-gold group-hover:text-ink">
+                      <ArrowUpRight className="size-4" />
+                    </span>
+                    <div className="absolute inset-x-0 bottom-0 p-5">
+                      <h3 className="font-display text-2xl font-semibold text-white">
+                        {c.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-white/75">{c.description}</p>
+                      <p className="mt-3 tnum text-xs font-medium uppercase tracking-wider text-gold">
+                        {countByCategory(c.value)} biens
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="mt-6 text-right">
@@ -138,7 +162,7 @@ export default async function HomePage() {
       {/* CONSTRUCTION — services */}
       <section className="relative overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=1600&h=900&fit=crop"
+          src={media.constructionBand}
           alt="Chantier de construction DarEstate"
           fill
           sizes="100vw"
@@ -152,13 +176,12 @@ export default async function HomePage() {
               Construction · Rénovation · Agencement
             </span>
             <h2 className="mt-5 font-display text-3xl font-semibold text-white sm:text-4xl">
-              Votre projet de construction,{" "}
-              <span className="font-serif italic text-gold">clé en main.</span>
+              Construction et rénovation,{" "}
+              <span className="font-serif italic text-gold">maîtrisées de bout en bout.</span>
             </h2>
             <p className="mt-4 text-pretty text-white/75">
-              De la conception à la livraison : construction de villas,
-              rénovation d&apos;appartements et agencement intérieur par une
-              équipe unique. Devis gratuit sous 48h.
+              Conception, réalisation et livraison : villas, appartements et
+              agencement intérieur, portés par une seule équipe. Devis sous 48h.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link href="/construction">
@@ -180,7 +203,7 @@ export default async function HomePage() {
 
           <div className="grid w-full max-w-sm grid-cols-2 gap-3">
             {[
-              { value: "+120", label: "Projets accompagnés" },
+              { value: "3", label: "Pôles métiers" },
               { value: "12", label: "Corps de métier intégrés" },
               { value: "100%", label: "Chantiers suivis" },
               { value: "48h", label: "Délai de réponse devis" },

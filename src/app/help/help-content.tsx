@@ -43,7 +43,7 @@ const faqs = [
   },
   {
     q: "Comment contacter le support DarEstate ?",
-    a: "Notre équipe est joignable par téléphone au +212 5 22 00 00 00 du lundi au vendredi de 9h à 19h, par email à contact@darestimate.ma, ou via le formulaire de la page contact. Nous répondons généralement sous 24 heures ouvrées.",
+    a: "Notre équipe est joignable par email à contact@darestimate.ma, ou via le formulaire de la page contact. Nous répondons généralement sous 24 heures ouvrées.",
   },
 ];
 

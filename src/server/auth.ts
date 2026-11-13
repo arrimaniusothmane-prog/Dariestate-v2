@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { User, UserRole } from "../types";
 import {
   ADMIN_CONTROL_EMAIL,
+  DEFAULT_PASSWORD,
   readUsers,
   writeUsers,
   toPublicUser,
@@ -11,6 +12,11 @@ import {
   normalizePhone,
   ServerUser,
 } from "./db";
+import {
+  hashPassword,
+  isHashedPassword,
+  verifyPassword,
+} from "./password";
 import {
   nameError,
   emailError,
@@ -31,23 +37,23 @@ export class ApiError extends Error {
   }
 }
 
-export function withSession(res: NextResponse, userId: string): NextResponse {
-  res.cookies.set(SESSION_COOKIE, userId, {
+function sessionCookieOptions(maxAge: number) {
+  return {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "lax" as const,
     path: "/",
-    maxAge: SESSION_MAX_AGE,
-  });
+    maxAge,
+    secure: process.env.NODE_ENV === "production",
+  };
+}
+
+export function withSession(res: NextResponse, userId: string): NextResponse {
+  res.cookies.set(SESSION_COOKIE, userId, sessionCookieOptions(SESSION_MAX_AGE));
   return res;
 }
 
 export function clearSession(res: NextResponse): NextResponse {
-  res.cookies.set(SESSION_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
+  res.cookies.set(SESSION_COOKIE, "", sessionCookieOptions(0));
   return res;
 }
 
@@ -73,6 +79,20 @@ export async function requireAdmin(): Promise<ServerUser> {
   return sessionUser;
 }
 
+export async function requireUser(): Promise<ServerUser> {
+  const sessionUser = await getSessionUser();
+  if (!sessionUser) {
+    throw new ApiError("Connexion requise.", 401);
+  }
+  if (sessionUser.status === "SUSPENDU") {
+    throw new ApiError(
+      "Ce compte a été suspendu. Contactez l'administrateur pour le restaurer.",
+      403
+    );
+  }
+  return sessionUser;
+}
+
 export async function authenticate(
   email: string,
   password: string
@@ -88,13 +108,20 @@ export async function authenticate(
       "Ce compte a été suspendu. Contactez l'administrateur pour le restaurer.",
       403
     );
-  if (!isMainAdmin(user))
-    throw new ApiError(
-      "Accès restreint : seul le compte administrateur peut se connecter.",
-      403
-    );
-  if (user.password !== password)
+  if (!verifyPassword(password, user.password))
     throw new ApiError("Mot de passe incorrect.", 401);
+
+  // Upgrade legacy plaintext passwords after a successful login.
+  if (!isHashedPassword(user.password)) {
+    const users = readUsers();
+    const index = users.findIndex((u) => u.id === user.id);
+    if (index !== -1) {
+      users[index] = { ...users[index], password: hashPassword(password) };
+      writeUsers(users);
+      return users[index];
+    }
+  }
+
   return user;
 }
 
@@ -171,7 +198,7 @@ export function registerUser(input: RegisterInput): User {
     licenseNumber: isProfessional
       ? input.cin?.trim().toUpperCase()
       : undefined,
-    password: input.password,
+    password: hashPassword(input.password),
   };
   writeUsers([...readUsers(), newUser]);
   return toPublicUser(newUser);
@@ -246,7 +273,7 @@ export function createUserByAdmin(input: AdminCreateInput): User {
     isVerified: input.isVerified ?? false,
     status: input.status ?? "ACTIF",
     companyName: input.companyName?.trim() || undefined,
-    password: input.password ?? "demo1234",
+    password: hashPassword(input.password ?? DEFAULT_PASSWORD),
   };
   writeUsers([...readUsers(), newUser]);
   return toPublicUser(newUser);

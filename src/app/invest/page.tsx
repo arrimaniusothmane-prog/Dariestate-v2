@@ -19,67 +19,67 @@ export const metadata = {
     "Découvrez les opportunités d'investissement immobilier au Maroc avec DarEstate. Rendements locatifs attractifs, programmes neufs premium et accompagnement juridique complet.",
   alternates: {
     canonical: "/invest",
-    languages: { fr: "/invest", en: "/invest", ar: "/invest" },
+    languages: { fr: "/invest" },
   },
 };
 
 const stats = [
-  { value: "15%", label: "croissance annuelle moyenne" },
   { value: "6", label: "grandes villes couvertes" },
-  { value: "200+", label: "biens d'investissement" },
-  { value: "2%", label: "commission de succès" },
+  { value: "2%", label: "commission au succès" },
+  { value: "100%", label: "annonces contrôlées" },
+  { value: "1", label: "interlocuteur dédié" },
 ];
 
 const reasons = [
   {
     icon: MapPin,
-    title: "Emplacement stratégique",
+    title: "Position stratégique",
     description:
-      "Le Maroc, à 14 km de l'Europe, est une porte d'entrée entre continents et un hub économique en pleine expansion.",
+      "Le Maroc constitue un carrefour économique entre l'Europe et l'Afrique, avec des métropoles en développement continu.",
   },
   {
     icon: TrendingUp,
-    title: "Rendements locatifs attractifs",
+    title: "Potentiel locatif",
     description:
-      "Une demande locative soutenue dans les grandes villes offre des rendements locatifs réguliers et intéressants.",
+      "La demande locative dans les grandes villes offre des perspectives de revenus réguliers pour les investisseurs.",
   },
   {
     icon: Building2,
-    title: "Programmes neufs premium",
+    title: "Offre résidentielle premium",
     description:
-      "Des résidences neuves et des programmes haut de gamme dans les quartiers les plus porteurs du royaume.",
+      "Résidences neuves et biens haut de gamme dans des quartiers à fort potentiel de valorisation.",
   },
   {
     icon: ShieldCheck,
-    title: "Accompagnement juridique",
+    title: "Cadre juridique accompagné",
     description:
-      "Transaction, notaire, fiscalité : notre équipe vous guide à chaque étape légale de votre investissement.",
+      "Transaction, notaire et fiscalité : nos équipes vous orientent à chaque étape de votre investissement.",
   },
 ];
 
 const investmentTypes = [
   {
     icon: Home,
-    title: "Résidence à louer",
-    description: "Investissez dans un appartement et générez un revenu locatif récurrent.",
+    title: "Résidence locative",
+    description: "Un appartement destiné à générer un revenu locatif récurrent.",
     href: "/properties?category=APARTMENT",
   },
   {
     icon: Landmark,
-    title: "Villa pied-à-terre",
-    description: "Une villa premium pour profiter du Maroc tout en valorisant votre capital.",
+    title: "Villa patrimoniale",
+    description: "Un bien premium pour un usage personnel ou une valorisation à long terme.",
     href: "/properties?category=VILLA",
   },
   {
     icon: MapPin,
     title: "Terrain résidentiel",
-    description: "Achetez un terrain et construisez le projet immobilier de vos ambitions.",
+    description: "Un foncier pour construire ou développer un projet immobilier.",
     href: "/properties?category=LAND",
   },
   {
     icon: Store,
     title: "Local commercial",
-    description: "Un emplacement commercial stratégique pour votre activité ou une location.",
+    description: "Un emplacement pour votre activité ou une mise en location professionnelle.",
     href: "/properties?category=COMMERCIAL",
   },
 ];
@@ -88,7 +88,7 @@ export default function InvestPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative flex min-h-[70vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=2000&h=1300&fit=crop"
           alt="Immeuble moderne premium au Maroc"
@@ -98,24 +98,23 @@ export default function InvestPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
               <TrendingUp className="size-4 text-gold" /> Investissement immobilier
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
-              Investissez là où{" "}
-              <span className="font-serif italic text-gold">le marché grandit.</span>
+              Investissez dans{" "}
+              <span className="font-serif italic text-gold">l&apos;immobilier marocain.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-white/85">
-              Le marché immobilier marocain connaît une croissance soutenue et
-              une demande locative en hausse. Profitez d&apos;une sélection de biens
-              d&apos;investissement vérifiés dans tout le royaume.
+              Une sélection de biens adaptés à l&apos;investissement locatif et
+              patrimonial, avec un accompagnement transactionnel et juridique.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/properties">
                 <Button size="lg" className="rounded-full bg-gold text-white hover:bg-gold/90">
-                  Découvrir les opportunités <ArrowRight className="ml-2 size-4" />
+                  Voir les opportunités <ArrowRight className="ml-2 size-4" />
                 </Button>
               </Link>
               <Link href="/contact">
@@ -124,7 +123,7 @@ export default function InvestPage() {
                   variant="outline"
                   className="rounded-full border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  Parler à un conseiller
+                  Échanger avec un conseiller
                 </Button>
               </Link>
             </div>
@@ -149,15 +148,14 @@ export default function InvestPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-              Le potentiel marocain
+              Marché marocain
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
-              Pourquoi investir au Maroc ?
+              Les atouts d&apos;un investissement au Maroc
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Une économie dynamique, une demande locative soutenue et des
-              prix encore accessibles : le Maroc est une destination
-              d&apos;investissement de premier plan.
+              Une demande locative soutenue, des métropoles en développement et
+              un cadre d&apos;accompagnement pour sécuriser chaque étape.
             </p>
           </div>
 

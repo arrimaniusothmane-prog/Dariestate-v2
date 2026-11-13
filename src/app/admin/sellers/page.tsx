@@ -26,15 +26,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { hiddenUserIds, mockProperties } from "@/data/properties";
+import { hiddenUserIds } from "@/data/properties";
 import {
   listUsers,
   createUser,
   updateUser,
   deleteUser,
 } from "@/services/userService";
+import { getProperties } from "@/services/propertyService";
 import { UserRole } from "@/types";
-import type { User } from "@/types";
+import type { Property, User } from "@/types";
 import { formatDate, cn } from "@/lib/utils";
 
 type SellerUser = User & { status: "ACTIF" | "SUSPENDU" };
@@ -45,6 +46,7 @@ function initials(name: string) {
 
 export default function AdminSellersPage() {
   const [sellers, setSellers] = useState<SellerUser[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -63,14 +65,15 @@ export default function AdminSellersPage() {
   });
 
   useEffect(() => {
-    listUsers(UserRole.SELLER)
-      .then((list) =>
+    Promise.all([listUsers(UserRole.SELLER), getProperties()])
+      .then(([list, props]) => {
         setSellers(
           list
             .filter((u) => !hiddenUserIds.includes(u.id))
             .map((u) => ({ ...u, status: u.status }))
-        )
-      )
+        );
+        setProperties(props);
+      })
       .catch((err) =>
         setActionError(
           err instanceof Error
@@ -95,8 +98,11 @@ export default function AdminSellersPage() {
   const suspendedCount = sellers.length - activeCount;
   const verifiedCount = sellers.filter((u) => u.isVerified).length;
 
+  const sellerProps = (sellerId: string) =>
+    properties.filter((p) => p.sellerId === sellerId);
+
   const totalProperties = sellers.reduce(
-    (sum, s) => sum + mockProperties.filter((p) => p.sellerId === s.id).length,
+    (sum, s) => sum + sellerProps(s.id).length,
     0
   );
 
@@ -292,7 +298,7 @@ export default function AdminSellersPage() {
           </thead>
           <tbody>
             {filtered.map((u) => {
-              const props = mockProperties.filter((p) => p.sellerId === u.id);
+              const props = sellerProps(u.id);
               return (
                 <tr key={u.id} className="border-b border-border/60 last:border-0 hover:bg-muted/40">
                   <td className="px-5 py-4">
@@ -372,7 +378,7 @@ export default function AdminSellersPage() {
       {/* Mobile cards */}
       <div className="space-y-4 lg:hidden">
         {filtered.map((u) => {
-          const props = mockProperties.filter((p) => p.sellerId === u.id);
+          const props = sellerProps(u.id);
           return (
             <div key={u.id} className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
@@ -565,7 +571,7 @@ export default function AdminSellersPage() {
                 <div className="flex justify-between gap-3 rounded-xl bg-sand/50 p-3.5">
                   <span className="text-muted-foreground">Biens publiés</span>
                   <span className="text-right font-semibold text-gold">
-                    {mockProperties.filter((p) => p.sellerId === viewing.id).length}
+                    {sellerProps(viewing.id).length}
                   </span>
                 </div>
                 <div className="flex justify-between gap-3 rounded-xl bg-sand/50 p-3.5">

@@ -220,7 +220,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                 className="flex w-full items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
               >
                 <Phone className="size-4 text-gold" />
-                {showPhone ? (seller?.phone ?? "+212 5 22 00 00 00") : "Afficher le téléphone"}
+                {showPhone ? (seller?.phone ?? "Non communiqué") : "Afficher le téléphone"}
               </button>
               <Button
                 onClick={() => setContactOpen(true)}

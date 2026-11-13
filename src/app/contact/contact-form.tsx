@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Phone,
   Mail,
   MapPin,
   Clock,
@@ -27,11 +26,6 @@ import { createDemande } from "@/services/demandeService";
 import { DemandeType } from "@/types";
 
 const contactCards = [
-  {
-    icon: Phone,
-    title: "Téléphone",
-    lines: ["+212 5 22 00 00 00"],
-  },
   {
     icon: Mail,
     title: "Email",
@@ -69,6 +63,7 @@ export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
 
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -79,6 +74,7 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
+    setError(null);
     try {
       await createDemande({
         type: DemandeType.CONTACT,
@@ -89,17 +85,22 @@ export function ContactForm() {
         phone: form.telephone,
         data: { sujet: form.sujet },
       });
-    } catch {
-      /* ignore */
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'envoyer votre message. Réessayez."
+      );
     } finally {
       setSending(false);
-      setSubmitted(true);
     }
   };
 
   const handleReset = () => {
     setForm(initialForm);
     setSubmitted(false);
+    setError(null);
   };
 
   return (
@@ -109,7 +110,7 @@ export function ContactForm() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
-              <Phone className="size-4 text-gold" /> Nous sommes à votre écoute
+              <Mail className="size-4 text-gold" /> Nous sommes à votre écoute
             </span>
             <h1 className="mt-6 font-display text-4xl font-semibold leading-tight text-white sm:text-5xl">
               Contactez{" "}
@@ -278,6 +279,12 @@ export function ContactForm() {
                       required
                     />
                   </div>
+
+                  {error && (
+                    <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                      {error}
+                    </p>
+                  )}
 
                   <Button
                     type="submit"

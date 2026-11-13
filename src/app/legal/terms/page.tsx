@@ -12,7 +12,7 @@ const sections = [
     paragraphs: [
       "Les présentes conditions générales d'utilisation (ci-après « CGU ») ont pour objet de définir les modalités et conditions dans lesquelles la société DarEstate SARL (ci-après « DarEstate » ou « l'Éditeur ») met à disposition des utilisateurs le site www.darestimate.ma ainsi que l'ensemble des services qui y sont proposés (ci-après le « Service »).",
       "Toute utilisation du Site implique l'acceptation sans réserve des présentes CGU. L'utilisateur reconnaît avoir pris connaissance des présentes conditions avant toute utilisation du Service. DarEstate se réserve le droit de modifier ces conditions à tout moment, les utilisateurs étant invités à les consulter régulièrement.",
-      "Le Site est destiné à toute personne physique ou morale souhaitant acquérir, vendre ou louer un bien immobilier au Maroc. L'accès au Service est gratuit, sous réserve de l'acceptation des présentes CGU et de la création d'un compte utilisateur.",
+      "Le Site est destiné à toute personne physique ou morale souhaitant acquérir, vendre ou louer un bien immobilier au Maroc. La consultation des annonces est libre. L'accès aux espaces personnels (acheteur, vendeur, agent) est actuellement sur invitation ou création par l'administrateur, sous réserve de l'acceptation des présentes CGU.",
     ],
   },
   {
@@ -27,7 +27,7 @@ const sections = [
   {
     title: "3. Accès au service",
     paragraphs: [
-      "Le Service est accessible gratuitement à tout utilisateur disposant d'une connexion Internet. L'accès au Site ne nécessite pas d'inscription préalable pour la simple consultation des annonces. Cependant, l'utilisation de certaines fonctionnalités — publication d'annonces, envoi de demandes, prise de rendez-vous — nécessite la création d'un compte utilisateur.",
+      "Le Service est accessible gratuitement à tout utilisateur disposant d'une connexion Internet. La consultation des annonces ne nécessite pas de compte. Certaines fonctionnalités (favoris, espaces vendeur/acheteur, publication) nécessitent un compte actif. Les inscriptions publiques sont temporairement fermées : un accès peut être demandé via le formulaire de contact.",
       "DarEstate se réserve le droit de suspendre ou de résilier sans préavis l'accès de tout utilisateur en cas de manquement aux présentes CGU ou de comportement préjudiciable au Service, à ses autres utilisateurs ou à autrui. L'Éditeur ne saurait être tenu responsable des interruptions temporaires du Service nécessitées par des opérations de maintenance ou des mises à jour.",
       "L'utilisateur s'engage à fournir des informations exactes lors de son inscription et à les maintenir à jour. Il est seul responsable de la confidentialité de ses identifiants de connexion et s'engage à notifier immédiatement DarEstate de toute utilisation non autorisée de son compte.",
     ],

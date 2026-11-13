@@ -52,13 +52,13 @@ const sections = [
     paragraphs: [
       "Conformément à la loi 09-08 relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, vous disposez des droits suivants concernant vos données personnelles : un droit d'accès vous permettant d'obtenir la confirmation que des données vous concernant sont traitées et d'en obtenir une copie, un droit de rectification vous permettant de corriger les données inexactes ou incomplètes, et un droit d'opposition vous permettant de vous opposer au traitement de vos données pour des motifs légitimes.",
       "Vous disposez également d'un droit à l'effacement de vos données, sous réserve des exceptions légales (obligation de conservation, litige en cours), et d'un droit à la portabilité des données vous permettant de recevoir les données que vous nous avez fournies dans un format structuré et couramment utilisé.",
-      "Pour exercer ces droits, vous pouvez contacter notre Délégué à la Protection des Données à l'adresse dpo@darestate.ma. Nous nous engageons à répondre à votre demande dans un délai de 30 jours. En cas de désaccord, vous disposez du droit d'introduire une réclamation auprès de l'ANRT (Agence Nationale de Régulation des Télécommunications).",
+      "Pour exercer ces droits, vous pouvez contacter notre Délégué à la Protection des Données à l'adresse dpo@darestimate.ma. Nous nous engageons à répondre à votre demande dans un délai de 30 jours. En cas de désaccord, vous disposez du droit d'introduire une réclamation auprès de l'ANRT (Agence Nationale de Régulation des Télécommunications).",
     ],
   },
   {
     title: "7. Contact",
     paragraphs: [
-      "Pour toute question relative à la présente Politique de confidentialité ou à l'exercice de vos droits, vous pouvez contacter notre Délégué à la Protection des Données : DarEstate SARL — DPO, Twin Center, Bureau 1204, Boulevard Zerktouni, Casablanca, Maroc. E-mail : dpo@darestate.ma. Téléphone : +212 5 22 00 00 00.",
+      "Pour toute question relative à la présente Politique de confidentialité ou à l'exercice de vos droits, vous pouvez contacter notre Délégué à la Protection des Données : DarEstate SARL — DPO, Twin Center, Bureau 1204, Boulevard Zerktouni, Casablanca, Maroc. E-mail : dpo@darestimate.ma. Formulaire : /contact.",
       "Nous nous engageons à traiter votre demande dans les meilleurs délais et à vous fournir une réponse motivée. Si vous estimez que le traitement de vos données n'est pas conforme à la législation applicable, vous avez le droit d'introduire une réclamation auprès de l'autorité de contrôle compétente.",
     ],
   },

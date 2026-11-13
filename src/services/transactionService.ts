@@ -4,30 +4,35 @@ import {
   Commission,
   DashboardStats,
 } from "../types";
-import {
-  mockTransactions,
-  mockCommissions,
-  mockProperties,
-  mockLeads,
-  mockVisits,
-  mockOffers,
-} from "../data/properties";
+import { setUserLookup } from "@/lib/lookup-cache";
+import { getProperties } from "./propertyService";
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+async function ensureLookups(): Promise<void> {
+  await getProperties();
+  try {
+    const res = await fetch("/api/directory", { credentials: "include" });
+    if (res.ok) setUserLookup(await res.json());
+  } catch {
+    /* ignore */
+  }
 }
 
-let transactions = [...mockTransactions];
-const commissions = [...mockCommissions];
-
 export async function getTransactions(): Promise<Transaction[]> {
-  await delay(300);
-  return [...transactions];
+  await ensureLookups();
+  const res = await fetch("/api/transactions?kind=transactions", {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Impossible de charger les transactions.");
+  return res.json();
 }
 
 export async function getCommissions(): Promise<Commission[]> {
-  await delay(300);
-  return [...commissions];
+  await ensureLookups();
+  const res = await fetch("/api/transactions?kind=commissions", {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Impossible de charger les commissions.");
+  return res.json();
 }
 
 export function calculateCommission(
@@ -40,43 +45,25 @@ export function calculateCommission(
 export async function createTransaction(
   transaction: Omit<Transaction, "id" | "createdAt">
 ): Promise<Transaction> {
-  await delay(300);
-  const newTransaction: Transaction = {
-    ...transaction,
-    id: `txn-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-  };
-  transactions = [...transactions, newTransaction];
-  return newTransaction;
+  const res = await fetch("/api/transactions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(transaction),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.error ?? "Impossible de créer la transaction.");
+  }
+  return res.json();
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  await delay(300);
-  const completedTransactions = transactions.filter(
-    (t) => t.status === TransactionStatus.COMPLETED
-  );
-  const totalRevenue = completedTransactions.reduce(
-    (sum, t) => sum + t.salePrice,
-    0
-  );
-  const commissionRevenue = completedTransactions.reduce(
-    (sum, t) => sum + t.commissionAmount,
-    0
-  );
-
-  return {
-    totalUsers: 4,
-    activeProperties: mockProperties.length,
-    newProperties: mockProperties.filter(
-      (p) =>
-        new Date(p.createdAt).getTime() >
-        Date.now() - 30 * 24 * 60 * 60 * 1000
-    ).length,
-    totalLeads: mockLeads.length,
-    visits: mockVisits.length,
-    offers: mockOffers.length,
-    completedTransactions: completedTransactions.length,
-    totalRevenue,
-    commissionRevenue,
-  };
+  const res = await fetch("/api/transactions?kind=stats", {
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Impossible de charger les statistiques.");
+  return res.json();
 }
+
+export type { TransactionStatus };

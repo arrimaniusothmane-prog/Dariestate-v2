@@ -6,7 +6,7 @@ export const metadata = {
     "Trouvez des réponses à vos questions sur DarEstate : achat, publication, vérification, visites, commission, offres et documents.",
   alternates: {
     canonical: "/help",
-    languages: { fr: "/help", en: "/help", ar: "/help" },
+    languages: { fr: "/help" },
   },
 };
 

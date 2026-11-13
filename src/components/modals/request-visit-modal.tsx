@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2, Users } from "lucide-react";
+import { Loader2, CheckCircle2, Users, AlertCircle } from "lucide-react";
 import type { Property } from "@/types";
 import { LeadStatus } from "@/types";
-import { createLead, createVisit } from "@/services/leadService";
+import { createVisitRequest } from "@/services/leadService";
 import { useAuth } from "@/components/providers/auth-provider";
 import { createDemande } from "@/services/demandeService";
 import { DemandeType } from "@/types";
@@ -35,6 +35,7 @@ export function RequestVisitModal({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const [form, setForm] = useState({
     date: "",
@@ -47,11 +48,14 @@ export function RequestVisitModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       await createDemande({
         type: DemandeType.VISITE,
         title: `Visite — ${property.title}`,
-        message: form.message || `Date: ${form.date} à ${form.time}, ${form.visitors} visiteur(s)`,
+        message:
+          form.message ||
+          `Date: ${form.date} à ${form.time}, ${form.visitors} visiteur(s)`,
         name: user?.name ?? "Acheteur",
         email: user?.email ?? "",
         phone: form.phone,
@@ -62,29 +66,28 @@ export function RequestVisitModal({
           visitors: form.visitors,
         },
       });
-      const lead = await createLead({
+      await createVisitRequest({
         propertyId: property.id,
-        buyerId: user?.id ?? "buyer-1",
         sellerId: property.sellerId,
+        buyerId: user?.id,
         status: LeadStatus.VISIT_REQUESTED,
         message: form.message,
         name: user?.name ?? "Acheteur",
         phone: form.phone,
         email: user?.email ?? "",
-      });
-      await createVisit({
-        propertyId: property.id,
-        leadId: lead.id,
         date: form.date,
         time: form.time,
         numberOfVisitors: Math.max(1, Number(form.visitors) || 1),
-        phone: form.phone,
-        message: form.message,
-        status: LeadStatus.VISIT_REQUESTED,
       });
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'envoyer la demande. Réessayez."
+      );
     } finally {
       setSubmitting(false);
-      setSubmitted(true);
     }
   };
 
@@ -122,6 +125,12 @@ export function RequestVisitModal({
             </DialogHeader>
 
             <div className="mt-5 space-y-4">
+              {error && (
+                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <p>{error}</p>
+                </div>
+              )}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="visit-date">Date souhaitée</Label>

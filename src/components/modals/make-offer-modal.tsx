@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import type { Property } from "@/types";
-import { LeadStatus, OfferStatus } from "@/types";
-import { createOffer, createLead } from "@/services/leadService";
+import { createOfferRequest } from "@/services/leadService";
 import { useAuth } from "@/components/providers/auth-provider";
 import { createDemande } from "@/services/demandeService";
 import { DemandeType } from "@/types";
@@ -32,6 +31,7 @@ export function MakeOfferModal({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const [form, setForm] = useState({
     price: String(property.price),
@@ -40,13 +40,15 @@ export function MakeOfferModal({
   });
 
   const price = Number(form.price.replace(/\s/g, "")) || 0;
-  const discountPct = price > 0 && price < property.price
-    ? Math.round(((property.price - price) / property.price) * 100)
-    : 0;
+  const discountPct =
+    price > 0 && price < property.price
+      ? Math.round(((property.price - price) / property.price) * 100)
+      : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       await createDemande({
         type: DemandeType.OFFRE,
@@ -61,27 +63,26 @@ export function MakeOfferModal({
           contact: form.contact,
         },
       });
-      await createOffer({
+      await createOfferRequest({
         propertyId: property.id,
-        buyerId: user?.id ?? "buyer-1",
-        price,
-        message: form.message,
-        preferredContact: form.contact,
-        status: OfferStatus.PENDING,
-      });
-      await createLead({
-        propertyId: property.id,
-        buyerId: user?.id ?? "buyer-1",
         sellerId: property.sellerId,
-        status: LeadStatus.OFFER_MADE,
+        buyerId: user?.id,
+        price,
         message: form.message || `Offre de ${price} MAD`,
+        preferredContact: form.contact,
         name: user?.name ?? "Acheteur",
         phone: user?.phone ?? "",
         email: user?.email ?? "",
       });
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'envoyer l'offre. Réessayez."
+      );
     } finally {
       setSubmitting(false);
-      setSubmitted(true);
     }
   };
 
@@ -93,8 +94,8 @@ export function MakeOfferModal({
             <CheckCircle2 className="size-16 text-green-500" />
             <h3 className="mt-4 text-xl font-semibold">Offre envoyée</h3>
             <p className="mt-2 max-w-sm text-muted-foreground">
-              Votre offre a été transmise au vendeur. Vous serez notifié
-              dès qu&apos;elle aura une réponse.
+              Votre offre a été transmise au vendeur. Vous serez notifié dès
+              qu&apos;elle aura une réponse.
             </p>
             <Button
               onClick={() => {
@@ -117,6 +118,12 @@ export function MakeOfferModal({
             </DialogHeader>
 
             <div className="mt-5 space-y-4">
+              {error && (
+                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  <p>{error}</p>
+                </div>
+              )}
               <div className="rounded-xl bg-sand p-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Prix demandé

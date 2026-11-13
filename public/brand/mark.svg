@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="DarEstate">
+  <rect width="64" height="64" rx="16" fill="#131e26"/>
+  <!-- Courtyard house: roof + walls + arched door -->
+  <path
+    fill="#c9a35a"
+    d="M32 12.5L50 26.2V28H46.5V49.5H38.5V36.5H25.5V49.5H17.5V28H14V26.2L32 12.5Z"
+  />
+  <path
+    fill="#131e26"
+    d="M32 34.5c-3.2 0-5.2 2-5.2 5.2V49.5h10.4V39.7c0-3.2-2-5.2-5.2-5.2Z"
+  />
+  <circle cx="32" cy="41.2" r="1.1" fill="#c9a35a"/>
+</svg>

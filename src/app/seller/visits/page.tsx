@@ -14,7 +14,7 @@ import {
 import type { Visit } from "@/types";
 import { LeadStatus } from "@/types";
 import { getVisits } from "@/services/leadService";
-import { mockProperties } from "@/data/properties";
+import { getProperties } from "@/services/propertyService";
 import {
   propertyById,
   visitStatusLabel,
@@ -105,9 +105,9 @@ export default function SellerVisitsPage() {
   const sellerId = useCurrentSellerId();
 
   useEffect(() => {
-    getVisits()
-      .then((all) => {
-        const sellerProps = mockProperties
+    Promise.all([getVisits(), getProperties()])
+      .then(([all, props]) => {
+        const sellerProps = props
           .filter((p) => p.sellerId === sellerId)
           .map((p) => p.id);
         setVisits(all.filter((v) => sellerProps.includes(v.propertyId)));

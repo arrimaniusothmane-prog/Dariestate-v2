@@ -38,15 +38,16 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { hiddenUserIds, mockProperties } from "@/data/properties";
+import { hiddenUserIds } from "@/data/properties";
 import {
   listUsers,
   createUser,
   updateUser,
   deleteUser,
 } from "@/services/userService";
+import { getProperties } from "@/services/propertyService";
 import { UserRole } from "@/types";
-import type { User } from "@/types";
+import type { Property, User } from "@/types";
 import { formatDate, cn } from "@/lib/utils";
 
 type AdminUser = User & { status: "ACTIF" | "SUSPENDU" };
@@ -67,10 +68,6 @@ const roleBadgeClass: Record<UserRole, string> = {
 
 function initials(name: string) {
   return name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
-}
-
-function propertyCount(userId: string) {
-  return mockProperties.filter((p) => p.sellerId === userId).length;
 }
 
 type RoleFilter = "ALL" | UserRole;
@@ -104,6 +101,7 @@ const emptyForm: UserForm = {
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -116,15 +114,19 @@ export default function AdminUsersPage() {
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState<UserForm>(emptyForm);
 
+  const propertyCount = (userId: string) =>
+    properties.filter((p) => p.sellerId === userId).length;
+
   useEffect(() => {
-    listUsers()
-      .then((list) =>
+    Promise.all([listUsers(), getProperties()])
+      .then(([list, props]) => {
         setUsers(
           list
             .filter((u) => !hiddenUserIds.includes(u.id))
             .map((u) => ({ ...u, status: u.status }))
-        )
-      )
+        );
+        setProperties(props);
+      })
       .catch((err) =>
         setActionError(
           err instanceof Error

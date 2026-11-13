@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Building2, Lock, ShieldCheck, ArrowLeft } from "lucide-react";
+import { Lock, ShieldCheck, ArrowLeft } from "lucide-react";
+import { BrandLogo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 
 export default function RegisterPage() {
@@ -33,8 +34,8 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <Building2 className="size-4 text-gold" />
-          Dar<span className="text-gold">Estate</span> ·{" "}
+          <BrandLogo href={null} size="sm" tone="brand" wordmark />
+          <span>·</span>
           <span className="flex items-center gap-1">
             <ShieldCheck className="size-3.5 text-gold" />
             Accès contrôlé

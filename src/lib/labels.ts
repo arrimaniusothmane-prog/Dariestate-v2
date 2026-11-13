@@ -9,6 +9,7 @@ import {
   TransactionStatus,
 } from "@/types";
 import { mockProperties, mockUsers } from "@/data/properties";
+import { getCachedProperty, getCachedUser } from "@/lib/lookup-cache";
 
 export const categoryLabel: Record<PropertyCategory, string> = {
   [PropertyCategory.APARTMENT]: "Appartement",
@@ -118,11 +119,13 @@ export const commissionStatusBadge: Record<CommissionStatus, string> = {
 };
 
 export function propertyById(id: string) {
-  return mockProperties.find((p) => p.id === id);
+  return (
+    getCachedProperty(id) ?? mockProperties.find((p) => p.id === id)
+  );
 }
 
 export function userById(id: string) {
-  return mockUsers.find((u) => u.id === id);
+  return getCachedUser(id) ?? mockUsers.find((u) => u.id === id);
 }
 
 export const demandeTypeLabel: Record<DemandeType, string> = {

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getPropertyBySlug, getProperties } from "@/services/propertyService";
+import {
+  getPropertyBySlug,
+  listProperties,
+} from "@/server/properties";
 import { PropertyDetail } from "@/components/property/property-detail";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/properties/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = getPropertyBySlug(slug);
   if (!property) return { title: "Bien introuvable" };
 
   const primary = property.images.find((i) => i.isPrimary) ?? property.images[0];
@@ -19,8 +22,6 @@ export async function generateMetadata({
       canonical: `/properties/${property.slug}`,
       languages: {
         fr: `/properties/${property.slug}`,
-        en: `/properties/${property.slug}`,
-        ar: `/properties/${property.slug}`,
       },
     },
     openGraph: {
@@ -40,15 +41,14 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const properties = await getProperties();
-  return properties.map((p) => ({ slug: p.slug }));
+  return listProperties().map((p) => ({ slug: p.slug }));
 }
 
 export default async function PropertyPage({
   params,
 }: PageProps<"/properties/[slug]">) {
   const { slug } = await params;
-  const property = await getPropertyBySlug(slug);
+  const property = getPropertyBySlug(slug);
 
   if (!property) {
     notFound();

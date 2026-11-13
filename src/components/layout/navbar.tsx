@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Building2, ChevronDown, Globe, LogOut, Plus, User as UserIcon } from "lucide-react";
+import { Globe, LogOut, Plus, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useI18n } from "@/components/providers/i18n-provider";
+import { BrandLogo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
-import type { Locale } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,10 +23,17 @@ import { UserRole } from "@/types";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
-  const { locale, setLocale, t } = useI18n();
+  const { t } = useI18n();
   const pathname = usePathname();
 
-  const onHero = pathname === "/";
+  const onHero =
+    pathname === "/" ||
+    pathname === "/about" ||
+    pathname === "/buy" ||
+    pathname === "/sell" ||
+    pathname === "/invest" ||
+    pathname === "/agent" ||
+    pathname === "/construction";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -50,12 +57,6 @@ export function Navbar() {
       ? "/seller"
       : "/buyer";
 
-  const langOptions: { code: Locale; label: string }[] = [
-    { code: "fr", label: "FR" },
-    { code: "ar", label: "عر" },
-    { code: "en", label: "EN" },
-  ];
-
   return (
     <header
       className={cn(
@@ -70,25 +71,10 @@ export function Navbar() {
           onHero && !scrolled && "text-white"
         )}
       >
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className={cn(
-              "flex size-9 items-center justify-center rounded-xl text-white transition-colors",
-              onHero && !scrolled ? "bg-white/15 backdrop-blur" : "bg-primary"
-            )}
-          >
-            <Building2 className="size-5 text-gold" />
-          </span>
-          <span
-            className={cn(
-              "font-display text-xl font-semibold tracking-tight transition-colors",
-              onHero && !scrolled && "text-white"
-            )}
-          >
-            Dar<span className="text-gold">Estate</span>
-          </span>
-        </Link>
+        <BrandLogo
+          tone={onHero && !scrolled ? "onDark" : "brand"}
+          size="md"
+        />
 
         {/* Center links */}
         <div className="hidden items-center gap-1 lg:flex">
@@ -111,40 +97,19 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {/* Language switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "gap-1",
-                    onHero && !scrolled && "text-white hover:bg-white/10 hover:text-white"
-                  )}
-                />
-              }
-            >
-              <Globe className="size-4" />
-              {langOptions.find((l) => l.code === locale)?.label}
-              <ChevronDown className="size-3" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[9rem]">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Langue</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {langOptions.map((lang) => (
-                  <DropdownMenuItem
-                    key={lang.code}
-                    onClick={() => setLocale(lang.code)}
-                    className={cn(locale === lang.code && "font-semibold text-gold")}
-                  >
-                    {lang.label} — {lang.code === "fr" ? "Français" : lang.code === "ar" ? "العربية" : "English"}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Language indicator — FR only until i18n is wired */}
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2.5 py-1.5 text-xs font-medium",
+              onHero && !scrolled
+                ? "text-white/85"
+                : "text-muted-foreground"
+            )}
+            title="Interface en français"
+          >
+            <Globe className="size-4" />
+            FR
+          </span>
 
           {user ? (
             <DropdownMenu>

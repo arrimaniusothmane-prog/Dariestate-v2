@@ -22,29 +22,14 @@ export interface ProfileUpdates {
   licenseNumber?: string;
 }
 
-export type ResetResult =
-  | { ok: true; email: string; name: string; password: string }
-  | { ok: false; error: string };
+export type ResetResult = { ok: false; error: string };
 
-export async function sendPasswordReset(email: string): Promise<ResetResult> {
-  try {
-    const data = await api<{
-      ok: true;
-      email: string;
-      name: string;
-      password: string;
-    }>("/api/auth/reset-password", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    });
-    return data;
-  } catch (e) {
-    return {
-      ok: false,
-      error:
-        e instanceof Error ? e.message : "Impossible de réinitialiser, réessayez.",
-    };
-  }
+export async function sendPasswordReset(_email: string): Promise<ResetResult> {
+  return {
+    ok: false,
+    error:
+      "La réinitialisation automatique n'est pas disponible. Contactez le support via /contact.",
+  };
 }
 
 export type LoginResult =

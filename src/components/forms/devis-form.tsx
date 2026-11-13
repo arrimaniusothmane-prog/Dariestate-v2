@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   Loader2,
   ArrowRight,
-  Phone,
   Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,6 +58,7 @@ function DevisFormInner() {
   const initialType = searchParams.get("type") || "";
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [type, setType] = useState(initialType);
   const [lastUrlType, setLastUrlType] = useState(initialType);
   if (lastUrlType !== initialType) {
@@ -92,6 +92,7 @@ function DevisFormInner() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
+    setError(null);
     try {
       await createDemande({
         type: DemandeType.DEVIS,
@@ -102,11 +103,15 @@ function DevisFormInner() {
         phone,
         data: { ville, bien, surface, budget, typeProjet: type, files: String(files.length) },
       });
-    } catch {
-      /* ignore — form shows success anyway */
+      setSubmitted(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Impossible d'envoyer la demande. Réessayez."
+      );
     } finally {
       setSending(false);
-      setSubmitted(true);
     }
   };
 
@@ -122,9 +127,6 @@ function DevisFormInner() {
           pour discuter de votre projet.
         </p>
         <div className="mt-6 flex items-center justify-center gap-3 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <Phone className="size-4 text-gold" /> +212 5 22 00 00 00
-          </span>
           <span className="flex items-center gap-1.5">
             <Mail className="size-4 text-gold" /> contact@darestimate.ma
           </span>
@@ -334,6 +336,12 @@ function DevisFormInner() {
           )}
         </div>
       </div>
+
+      {error && (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
       <Button
         type="submit"

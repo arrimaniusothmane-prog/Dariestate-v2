@@ -13,6 +13,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/dashboard-shell";
+import { SellerGuard } from "@/components/auth/role-guard";
 
 const items: NavItem[] = [
   { label: "Vue d'ensemble", href: "/seller", icon: LayoutDashboard },
@@ -28,6 +29,8 @@ const items: NavItem[] = [
 
 export default function SellerLayout({ children }: { children: ReactNode }) {
   return (
-    <DashboardShell items={items}>{children}</DashboardShell>
+    <SellerGuard>
+      <DashboardShell items={items}>{children}</DashboardShell>
+    </SellerGuard>
   );
 }

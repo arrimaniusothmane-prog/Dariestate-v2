@@ -2,26 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, HardHat, Heart, User, Search } from "lucide-react";
+import { HardHat, Heart, Search, UserRound } from "lucide-react";
+import { BrandMark } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 
 export function MobileNav() {
   const pathname = usePathname();
 
   const items = [
-    { href: "/", label: "Accueil", icon: Home },
-    { href: "/properties", label: "Recherche", icon: Search },
-    { href: "/construction", label: "Construction", icon: HardHat },
-    { href: "/favorites", label: "Favoris", icon: Heart },
-    { href: "/account", label: "Compte", icon: User },
+    { href: "/", label: "Accueil", kind: "brand" as const },
+    { href: "/properties", label: "Recherche", kind: "icon" as const, Icon: Search },
+    { href: "/construction", label: "Travaux", kind: "icon" as const, Icon: HardHat },
+    { href: "/favorites", label: "Favoris", kind: "icon" as const, Icon: Heart },
+    { href: "/account", label: "Compte", kind: "icon" as const, Icon: UserRound },
   ];
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 md:hidden" aria-label="Navigation mobile">
       <div className="glass border-t border-border/60 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5 h-16">
+        <div className="grid h-16 grid-cols-5">
           {items.map((item) => {
-            const Icon = item.icon;
             const active =
               pathname === item.href ||
               (item.href !== "/" && pathname.startsWith(item.href));
@@ -30,13 +30,23 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
+                  "relative flex flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors",
                   active
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-primary"
+                    ? "text-ink"
+                    : "text-muted-foreground hover:text-ink"
                 )}
               >
-                <Icon className={cn("size-5", active && "text-gold")} strokeWidth={active ? 2.2 : 1.8} />
+                {item.kind === "brand" ? (
+                  <BrandMark
+                    tone={active ? "brand" : "onLight"}
+                    className="size-6 rounded-lg"
+                  />
+                ) : (
+                  <item.Icon
+                    className={cn("size-5", active && "text-gold-strong")}
+                    strokeWidth={active ? 2.25 : 1.75}
+                  />
+                )}
                 {item.label}
                 {active && (
                   <span className="absolute top-0 h-0.5 w-8 rounded-full bg-gold" />

@@ -36,12 +36,12 @@ export default function MentionsPage() {
                 1204, Boulevard Zerktouni, Casablanca, Maroc.
               </p>
               <p>
-                Numéro de registre du commerce : RC 123456 · Patente : 12345678 ·
-                Numéro ICE : 001234567000012 · CNSS : 1234567.
+                Identifiants légaux (RC, patente, ICE, CNSS) : en cours de
+                mise à jour. Pour toute demande officielle, écrivez à
+                contact@darestimate.ma.
               </p>
               <p>
-                Téléphone : +212 5 22 00 00 00 · E-mail :
-                contact@darestate.ma
+                E-mail : contact@darestimate.ma · Formulaire : /contact
               </p>
             </div>
           </section>
@@ -93,10 +93,10 @@ export default function MentionsPage() {
                 Boulevard Zerktouni, Casablanca, Maroc.
               </p>
               <p>
-                Par e-mail : contact@darestate.ma
+                Par e-mail : contact@darestimate.ma
               </p>
               <p>
-                Par téléphone : +212 5 22 00 00 00
+                Via le formulaire de contact sur le site.
               </p>
               <p>
                 Service disponible du lundi au vendredi, de 9h00 à 18h00.

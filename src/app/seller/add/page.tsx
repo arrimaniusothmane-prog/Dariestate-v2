@@ -8,11 +8,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
-  Building2,
-  TreePine,
-  Home,
-  Map,
-  Store,
   ImagePlus,
   UploadCloud,
   X,
@@ -42,29 +37,31 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { formatPrice, cn } from "@/lib/utils";
+import { categoryIcon } from "@/components/brand/category-icons";
+import { categoryMedia } from "@/lib/media";
 
-const CITIES = ["Casablanca", "Marrakech", "Rabat", "Tangier", "Fez", "Agadir"];
+const CITIES = ["Casablanca", "Marrakech", "Rabat", "Tanger", "Fès", "Agadir"];
 
 const PHOTO_OPTIONS = [
-  { url: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=800&fit=crop", label: "Façade moderne" },
-  { url: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop", label: "Extérieur" },
+  { url: categoryMedia[PropertyCategory.VILLA].image, label: "Villa & piscine" },
   { url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop", label: "Cuisine" },
-  { url: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=800&fit=crop", label: "Salon" },
+  { url: categoryMedia[PropertyCategory.APARTMENT].image, label: "Salon" },
   { url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&h=800&fit=crop", label: "Extérieur & vue" },
   { url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop", label: "Chambre" },
+  { url: categoryMedia[PropertyCategory.HOUSE].image, label: "Maison" },
 ];
 
 const CATEGORY_OPTIONS: {
   value: PropertyCategory;
   label: string;
-  icon: typeof Building2;
+  icon: (typeof categoryIcon)[PropertyCategory];
   description: string;
 }[] = [
-  { value: PropertyCategory.APARTMENT, label: categoryLabel[PropertyCategory.APARTMENT], icon: Building2, description: "Appartement en immeuble, résidence ou en copropriété." },
-  { value: PropertyCategory.VILLA, label: categoryLabel[PropertyCategory.VILLA], icon: TreePine, description: "Villa individuelle avec jardin, piscine ou plain-pied." },
-  { value: PropertyCategory.HOUSE, label: categoryLabel[PropertyCategory.HOUSE], icon: Home, description: "Maison de ville ou familiale." },
-  { value: PropertyCategory.LAND, label: categoryLabel[PropertyCategory.LAND], icon: Map, description: "Terrain constructible, résidentiel ou agricole." },
-  { value: PropertyCategory.COMMERCIAL, label: categoryLabel[PropertyCategory.COMMERCIAL], icon: Store, description: "Boutique, bureau, restaurant ou local d'activité." },
+  { value: PropertyCategory.APARTMENT, label: categoryLabel[PropertyCategory.APARTMENT], icon: categoryIcon[PropertyCategory.APARTMENT], description: "Appartement en immeuble, résidence ou en copropriété." },
+  { value: PropertyCategory.VILLA, label: categoryLabel[PropertyCategory.VILLA], icon: categoryIcon[PropertyCategory.VILLA], description: "Villa individuelle avec jardin, piscine ou plain-pied." },
+  { value: PropertyCategory.HOUSE, label: categoryLabel[PropertyCategory.HOUSE], icon: categoryIcon[PropertyCategory.HOUSE], description: "Maison de ville ou familiale." },
+  { value: PropertyCategory.LAND, label: categoryLabel[PropertyCategory.LAND], icon: categoryIcon[PropertyCategory.LAND], description: "Terrain constructible, résidentiel ou agricole." },
+  { value: PropertyCategory.COMMERCIAL, label: categoryLabel[PropertyCategory.COMMERCIAL], icon: categoryIcon[PropertyCategory.COMMERCIAL], description: "Boutique, bureau, restaurant ou local d'activité." },
 ];
 
 const AMENITIES = [
@@ -368,7 +365,7 @@ export default function SellerAddPropertyPage() {
           email: "",
           phone: "",
           data: {
-            category: draft.category,
+            category: draft.category ?? "",
             city: draft.city,
             price: draft.price,
             surface: draft.surface,

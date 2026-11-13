@@ -5,6 +5,8 @@ import { AppProviders } from "@/components/providers/app-providers";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { SiteFooter, SiteHeader } from "@/components/layout/site-chrome";
+import { organizationJsonLd, siteUrl } from "@/lib/seo";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +27,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.darestimate.ma"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "DarEstate — Le marché immobilier premium au Maroc",
     template: "%s | DarEstate",
@@ -40,12 +42,15 @@ export const metadata: Metadata = {
     "terrain marrakech",
     "DarEstate",
     "immobilier premium maroc",
+    "agence immobilière casablanca",
   ],
+  authors: [{ name: "DarEstate" }],
+  creator: "DarEstate",
+  publisher: "DarEstate",
   alternates: {
+    canonical: "/",
     languages: {
       fr: "/",
-      en: "/",
-      ar: "/",
       "x-default": "/",
     },
   },
@@ -53,15 +58,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "DarEstate",
-    url: "https://www.darestimate.ma",
+    url: siteUrl,
     title: "DarEstate — Le marché immobilier premium au Maroc",
     description:
       "Découvrez des appartements, villas et terrains sélectionnés au Maroc.",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=630&fit=crop",
-        width: 1200,
-        height: 630,
+        url: "/brand/mark.jpg",
+        width: 1024,
+        height: 1024,
         alt: "DarEstate — Immobilier premium au Maroc",
       },
     ],
@@ -71,14 +76,22 @@ export const metadata: Metadata = {
     title: "DarEstate — Le marché immobilier premium au Maroc",
     description:
       "Découvrez des appartements, villas et terrains sélectionnés au Maroc.",
-    images: [
-      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=630&fit=crop",
-    ],
+    images: ["/brand/mark.jpg"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -89,6 +102,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${manrope.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd()),
+          }}
+        />
         <AppProviders>
           <a
             href="#main-content"
@@ -96,12 +115,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           >
             Aller au contenu principal
           </a>
-          <Navbar />
+          <SiteHeader>
+            <Navbar />
+          </SiteHeader>
           <main id="main-content" className="flex-1">
             {children}
           </main>
-          <Footer />
-          <MobileNav />
+          <SiteFooter>
+            <Footer />
+            <MobileNav />
+          </SiteFooter>
         </AppProviders>
       </body>
     </html>
