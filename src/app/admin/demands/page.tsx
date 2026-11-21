@@ -40,6 +40,8 @@ const typeFilters = [
   { value: DemandeType.VISITE, label: "Visite" },
   { value: DemandeType.OFFRE, label: "Offre" },
   { value: DemandeType.PUBLICATION, label: "Publication" },
+  { value: DemandeType.ALERTE, label: "Alerte" },
+  { value: DemandeType.ESTIMATION, label: "Estimation" },
 ];
 
 export default function AdminDemandesPage() {

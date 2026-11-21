@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPropertyBySlug, getProperties } from "@/services/propertyService";
 import { PropertyDetail } from "@/components/property/property-detail";
+import { listingJsonLd } from "@/lib/schema";
 
 export async function generateMetadata({
   params,
@@ -54,5 +55,13 @@ export default async function PropertyPage({
     notFound();
   }
 
-  return <PropertyDetail property={property} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(listingJsonLd(property)) }}
+      />
+      <PropertyDetail property={property} />
+    </>
+  );
 }

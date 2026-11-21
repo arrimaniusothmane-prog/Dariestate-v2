@@ -33,6 +33,14 @@ export function pageMetadata({
       title,
       description,
       url: path ? `${siteUrl}${path}` : undefined,
+      images: [
+        {
+          url: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&h=630&q=70",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
     },
     robots: index ? undefined : { index: false, follow: false },
   };

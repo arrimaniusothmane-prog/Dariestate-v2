@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { agency, telHref } from "@/lib/agency";
 import Link from "next/link";
 import {
   HardHat,
@@ -394,7 +395,7 @@ function SectionHeading({
 }) {
   return (
     <div className={cn(center && "mx-auto text-center")}>
-      <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+      <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
         {eyebrow}
       </span>
       <h2
@@ -433,7 +434,7 @@ export default function ConstructionPage() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/35" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/85 via-[#0a0a0a]/60 to-[#0a0a0a]/35" />
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
@@ -493,7 +494,7 @@ export default function ConstructionPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+              <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
                 Qui nous sommes
               </span>
               <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
@@ -571,7 +572,7 @@ export default function ConstructionPage() {
                       sizes="(min-width: 1024px) 33vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/50 to-transparent" />
                     <span className="absolute left-4 top-4 flex size-10 items-center justify-center rounded-xl bg-white/15 font-display text-sm font-bold text-white backdrop-blur-md">
                       {a.number}
                     </span>
@@ -728,7 +729,7 @@ export default function ConstructionPage() {
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/40 via-transparent to-transparent" />
                     <div className="absolute bottom-3 left-3 flex size-11 items-center justify-center rounded-xl bg-gold text-white shadow-lg transition-colors">
                       <Icon className="size-5" />
                     </div>
@@ -763,7 +764,7 @@ export default function ConstructionPage() {
                       sizes="(min-width: 1024px) 33vw, 100vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/30 to-transparent" />
                     <div className="absolute bottom-3 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-gold text-white shadow-lg">
                       <Icon className="size-7" />
                     </div>
@@ -870,7 +871,7 @@ export default function ConstructionPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-start gap-12 lg:grid-cols-2">
             <div className="lg:sticky lg:top-24">
-              <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+              <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
                 Devis gratuit
               </span>
               <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
@@ -907,7 +908,7 @@ export default function ConstructionPage() {
                       <p className="text-xs text-muted-foreground">
                         Appelez-nous
                       </p>
-                      <p className="text-sm font-semibold">+212 5 22 00 00 00</p>
+                      <a href={telHref()} className="text-sm font-semibold">{agency.phoneDisplay}</a>
                     </div>
                   </div>
                 </div>

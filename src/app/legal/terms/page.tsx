@@ -111,7 +111,7 @@ export default function TermsPage() {
     <div className="bg-background py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+          <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
             Informations légales
           </span>
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">

@@ -86,6 +86,10 @@ export interface Property {
   title: string;
   description: string;
   price: number;
+  /** Prix précédent, lorsque l'annonce a baissé. */
+  previousPrice?: number;
+  /** Vente par défaut. "rent" = loyer mensuel. */
+  listing?: "sale" | "rent";
   category: PropertyCategory;
   status: PropertyStatus;
   address: {
@@ -139,6 +143,7 @@ export interface PropertyFilters {
   isVerified: boolean | undefined;
   status: PropertyStatus | undefined;
   sortBy: string | undefined;
+  intent: "sale" | "rent" | undefined;
 }
 
 export interface Lead {
@@ -232,6 +237,8 @@ export enum DemandeType {
   VISITE = "VISITE",
   OFFRE = "OFFRE",
   PUBLICATION = "PUBLICATION",
+  ALERTE = "ALERTE",
+  ESTIMATION = "ESTIMATION",
 }
 
 export enum DemandeStatus {

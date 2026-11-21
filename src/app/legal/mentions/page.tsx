@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { agency } from "@/lib/agency";
 
 export const metadata: Metadata = {
   title: "Mentions légales",
@@ -11,7 +12,7 @@ export default function MentionsPage() {
     <div className="bg-background py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+          <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
             Informations légales
           </span>
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
@@ -40,7 +41,7 @@ export default function MentionsPage() {
                 Numéro ICE : 001234567000012 · CNSS : 1234567.
               </p>
               <p>
-                Téléphone : +212 5 22 00 00 00 · E-mail :
+                Téléphone : {agency.phoneDisplay} · E-mail :
                 contact@darestate.ma
               </p>
             </div>
@@ -96,7 +97,7 @@ export default function MentionsPage() {
                 Par e-mail : contact@darestate.ma
               </p>
               <p>
-                Par téléphone : +212 5 22 00 00 00
+                Par téléphone : {agency.phoneDisplay}
               </p>
               <p>
                 Service disponible du lundi au vendredi, de 9h00 à 18h00.

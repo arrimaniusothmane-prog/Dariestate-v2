@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Building2, ChevronDown, Globe, LogOut, Plus, User as UserIcon } from "lucide-react";
+import {
+  Building2,
+  Globe,
+  HardHat,
+  Info,
+  LogOut,
+  Menu,
+  Moon,
+  Sun,
+  TrendingUp,
+  User as UserIcon,
+} from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useI18n } from "@/components/providers/i18n-provider";
+import { useTheme } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,25 +32,30 @@ import {
 import { UserRole } from "@/types";
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
   const { locale, setLocale, t } = useI18n();
+  const { theme, toggle } = useTheme();
   const pathname = usePathname();
-
-  const onHero = pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
+  const isAuth =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = [
-    { href: "/invest", label: t("nav.investir") },
-    { href: "/construction", label: t("nav.travaux") },
-    { href: "/properties", label: t("nav.nosBiens") },
-    { href: "/about", label: t("nav.apropos") },
+  if (isAuth) return null;
+
+  const tabs = [
+    { href: "/properties", label: t("nav.nosBiens"), icon: Building2 },
+    { href: "/construction", label: t("nav.travaux"), icon: HardHat },
+    { href: "/invest", label: t("nav.investir"), icon: TrendingUp },
+    { href: "/about", label: t("nav.apropos"), icon: Info },
   ];
 
   const dashboardHref =
@@ -56,80 +72,71 @@ export function Navbar() {
     { code: "en", label: "EN" },
   ];
 
+  const pill = cn(
+    "flex h-14 items-center rounded-full border shadow-[0_8px_24px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-colors",
+    scrolled
+      ? "border-white/20 bg-[#111111]/92"
+      : "border-white/10 bg-[#111111]/95"
+  );
+
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled ? "glass shadow-sm" : "bg-transparent"
-      )}
-    >
-      <nav
-        className={cn(
-          "mx-auto flex max-w-7xl items-center justify-between px-4 transition-all duration-300 sm:px-6 lg:px-8",
-          scrolled ? "h-14" : "h-16",
-          onHero && !scrolled && "text-white"
-        )}
-      >
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className={cn(
-              "flex size-9 items-center justify-center rounded-xl text-white transition-colors",
-              onHero && !scrolled ? "bg-white/15 backdrop-blur" : "bg-primary"
-            )}
-          >
-            <Building2 className="size-5 text-gold" />
-          </span>
-          <span
-            className={cn(
-              "font-display text-xl font-semibold tracking-tight transition-colors",
-              onHero && !scrolled && "text-white"
-            )}
-          >
-            Dar<span className="text-gold">Estate</span>
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 hidden px-4 pt-3 md:block md:px-6 md:pt-4">
+      <nav className="pointer-events-auto relative mx-auto grid max-w-[1180px] grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className={cn(pill, "w-full min-w-0 justify-center gap-1 overflow-x-auto px-2.5")}>
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const active =
+              pathname === tab.href ||
+              (tab.href !== "/" && pathname.startsWith(tab.href));
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-white/10 text-white"
+                    : "text-white/70 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <Icon className="size-[1.125rem] shrink-0" strokeWidth={1.7} />
+                <span className="whitespace-nowrap">{tab.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        <Link href="/" aria-label="DarEstate — Accueil" className="relative z-10 justify-self-center shrink-0">
+          <span className="flex size-16 flex-col items-center justify-center gap-0.5 rounded-full border border-white/15 bg-[#111111] shadow-[0_8px_24px_rgba(0,0,0,0.4)]">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-white text-[#111111]">
+              <Building2 className="size-4" />
+            </span>
+            <span className="text-[10px] leading-none font-semibold tracking-tight text-white">
+              Dar<span className="text-white/70">Estate</span>
+            </span>
           </span>
         </Link>
 
-        {/* Center links */}
-        <div className="hidden items-center gap-1 lg:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                onHero && !scrolled
-                  ? "text-white/85 hover:bg-white/10 hover:text-white"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                pathname === link.href && "font-semibold text-foreground"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        <div className={cn(pill, "w-full min-w-0 justify-end gap-2 px-3")}>
+          <Link
+            href="/publish"
+            className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            {t("nav.publier")}
+          </Link>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {/* Language switcher */}
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "gap-1",
-                    onHero && !scrolled && "text-white hover:bg-white/10 hover:text-white"
-                  )}
+                <button
+                  aria-label="Changer de langue"
+                  className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
                 />
               }
             >
               <Globe className="size-4" />
-              {langOptions.find((l) => l.code === locale)?.label}
-              <ChevronDown className="size-3" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[9rem]">
+            <DropdownMenuContent align="end" className="min-w-[10rem]">
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Langue</DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -137,41 +144,67 @@ export function Navbar() {
                   <DropdownMenuItem
                     key={lang.code}
                     onClick={() => setLocale(lang.code)}
-                    className={cn(locale === lang.code && "font-semibold text-gold")}
+                    className={cn(
+                      locale === lang.code && "font-semibold text-brand-text"
+                    )}
                   >
-                    {lang.label} — {lang.code === "fr" ? "Français" : lang.code === "ar" ? "العربية" : "English"}
+                    {lang.label} —{" "}
+                    {lang.code === "fr"
+                      ? "Français"
+                      : lang.code === "ar"
+                        ? "العربية"
+                        : "English"
+                    }
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button
-                    className={cn(
-                      "flex size-9 items-center justify-center overflow-hidden rounded-full border transition-colors",
-                      onHero && !scrolled
-                        ? "border-white/30 bg-white/10"
-                        : "border-border bg-card"
-                    )}
-                  />
-                }
-              >
-                {user.avatar ? (
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Passer en mode clair" : "Passer en mode sombre"}
+            className="flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+          >
+            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <button
+                  aria-label="Menu"
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full transition-colors",
+                    user
+                      ? "border border-white/15 bg-white/10 hover:bg-white/20"
+                      : "bg-white/10 hover:bg-white/20"
+                  )}
+                />
+              }
+            >
+              {user ? (
+                user.avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={user.avatar} alt={user.name} className="size-full object-cover" />
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="size-full rounded-full object-cover"
+                  />
                 ) : (
-                  <UserIcon className="size-4 text-muted-foreground" />
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+                  <UserIcon className="size-4 text-white" />
+                )
+              ) : (
+                <Menu className="size-4 text-white" />
+              )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60">
+              {user ? (
                 <DropdownMenuGroup>
                   <DropdownMenuLabel className="font-normal">
-                    <p className="font-medium text-foreground">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    <p className="font-medium text-hof">{user.name}</p>
+                    <p className="text-xs text-foggy">{user.email}</p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem render={<Link href={dashboardHref} />}>
@@ -180,35 +213,42 @@ export function Navbar() {
                   <DropdownMenuItem render={<Link href="/favorites" />}>
                     Mes favoris
                   </DropdownMenuItem>
+                  <DropdownMenuItem render={<Link href="/publish" />}>
+                    Publier un bien
+                  </DropdownMenuItem>
+                  {tabs.map((tab) => (
+                    <DropdownMenuItem key={tab.href} render={<Link href={tab.href} />}>
+                      {tab.label}
+                    </DropdownMenuItem>
+                  ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => logout()} className="text-destructive">
                     <LogOut className="mr-2 size-4" />
                     {t("nav.deconnexion")}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className={cn(
-                  "rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4",
-                  onHero && !scrolled
-                    ? "text-white/85 hover:bg-white/10 hover:text-white"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {t("nav.connexion")}
-              </Link>
-              <Link href="/publish" className="hidden sm:block">
-                <Button size="sm" className="gap-1.5 rounded-full shadow-sm shadow-gold/20">
-                  <Plus className="size-4" />
-                  {t("nav.publier")}
-                </Button>
-              </Link>
-            </>
-          )}
+              ) : (
+                <DropdownMenuGroup>
+                  <DropdownMenuItem render={<Link href="/login" />}>
+                    {t("nav.connexion")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem render={<Link href="/publish" />}>
+                    {t("nav.publier")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {tabs.map((tab) => (
+                    <DropdownMenuItem key={tab.href} render={<Link href={tab.href} />}>
+                      {tab.label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem render={<Link href="/contact" />}>
+                    Contact
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
     </header>

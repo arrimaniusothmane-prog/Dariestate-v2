@@ -1,3 +1,4 @@
+import { agency } from "@/lib/agency";
 import {
   User,
   UserRole,
@@ -23,7 +24,7 @@ export const mockUsers: User[] = [
     id: 'admin-1',
     name: 'Admin DarEstate',
     email: 'admin@darestimate.ma',
-    phone: '+212 5 22 00 00 00',
+    phone: agency.phoneDisplay,
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     role: UserRole.ADMIN,
     createdAt: '2025-09-01T08:00:00Z',
@@ -106,11 +107,11 @@ export const mockProperties: Property[] = [
     floors: 2,
     yearBuilt: 2022,
     images: [
-      { id: 'img-1a', url: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&h=800&fit=crop', alt: 'Façade de la villa moderne Bouskoura', isPrimary: true, order: 0 },
-      { id: 'img-1b', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop', alt: 'Salon principal avec vue sur le jardin', isPrimary: false, order: 1 },
-      { id: 'img-1c', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop', alt: 'Cuisine moderne équipée', isPrimary: false, order: 2 },
-      { id: 'img-1d', url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop', alt: 'Chambre principale spacieuse', isPrimary: false, order: 3 },
-      { id: 'img-1e', url: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=1200&h=800&fit=crop', alt: 'Jardin paysager avec piscine', isPrimary: false, order: 4 },
+      { id: 'img-1a', url: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1600&q=70', alt: 'Façade de la villa moderne Bouskoura', isPrimary: true, order: 0 },
+      { id: 'img-1b', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=70', alt: 'Salon principal avec vue sur le jardin', isPrimary: false, order: 1 },
+      { id: 'img-1c', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine moderne équipée', isPrimary: false, order: 2 },
+      { id: 'img-1d', url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre principale spacieuse', isPrimary: false, order: 3 },
+      { id: 'img-1e', url: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?auto=format&fit=crop&w=1600&q=70', alt: 'Jardin paysager avec piscine', isPrimary: false, order: 4 },
     ],
     amenities: ['Piscine chauffée', 'Jardin paysager', 'Système de sécurité 24h/24', 'Climatisation centrale', 'Chauffage au sol', 'Domotique', 'Garage double'],
     features: ['Design contemporain', 'Finitions haut de gamme', 'Terrasse panoramique', 'Cuisine équipée', 'Chambres avec rangements'],
@@ -151,10 +152,10 @@ export const mockProperties: Property[] = [
     floors: 6,
     yearBuilt: 2020,
     images: [
-      { id: 'img-2a', url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=800&fit=crop', alt: 'Salon lumineux de l\'appartement Maarif', isPrimary: true, order: 0 },
-      { id: 'img-2b', url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop', alt: 'Chambre principale meublée', isPrimary: false, order: 1 },
-      { id: 'img-2c', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=800&fit=crop', alt: 'Cuisine ouverte moderne', isPrimary: false, order: 2 },
-      { id: 'img-2d', url: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&h=800&fit=crop', alt: 'Salle de bains en design contemporain', isPrimary: false, order: 3 },
+      { id: 'img-2a', url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=70', alt: 'Salon lumineux de l\'appartement Maarif', isPrimary: true, order: 0 },
+      { id: 'img-2b', url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre principale meublée', isPrimary: false, order: 1 },
+      { id: 'img-2c', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine ouverte moderne', isPrimary: false, order: 2 },
+      { id: 'img-2d', url: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=1600&q=70', alt: 'Salle de bains en design contemporain', isPrimary: false, order: 3 },
     ],
     amenities: ['Ascenseur', 'Gardien', 'Climatisation', 'Meublé haut de gamme', 'Internet fibre optique', 'Interphone vidéo'],
     features: ['Meublé complet', 'Parquet en bois massif', 'Cuisine ouverte', 'Proximité tramway', 'Finitions premium'],
@@ -195,11 +196,11 @@ export const mockProperties: Property[] = [
     floors: 2,
     yearBuilt: 2023,
     images: [
-      { id: 'img-3a', url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=800&fit=crop', alt: 'Vue extérieure de la villa Californie', isPrimary: true, order: 0 },
-      { id: 'img-3b', url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=800&fit=crop', alt: 'Piscine chauffée et terrasse', isPrimary: false, order: 1 },
-      { id: 'img-3c', url: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&h=800&fit=crop', alt: 'Salon principal avec hauteur sous plafond', isPrimary: false, order: 2 },
-      { id: 'img-3d', url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&h=800&fit=crop', alt: 'Suite parentale avec dressing', isPrimary: false, order: 3 },
-      { id: 'img-3e', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&h=800&fit=crop', alt: 'Jardin méditerranéen', isPrimary: false, order: 4 },
+      { id: 'img-3a', url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=70', alt: 'Vue extérieure de la villa Californie', isPrimary: true, order: 0 },
+      { id: 'img-3b', url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1600&q=70', alt: 'Piscine chauffée et terrasse', isPrimary: false, order: 1 },
+      { id: 'img-3c', url: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1600&q=70', alt: 'Salon principal avec hauteur sous plafond', isPrimary: false, order: 2 },
+      { id: 'img-3d', url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=70', alt: 'Suite parentale avec dressing', isPrimary: false, order: 3 },
+      { id: 'img-3e', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1600&q=70', alt: 'Jardin méditerranéen', isPrimary: false, order: 4 },
     ],
     amenities: ['Piscine chauffée', 'Jardin méditerranéen', 'Garage triple', 'Système de sécurité', 'Domotique complète', 'Climatisation réversible', 'Salle de sport', 'Buanderie'],
     features: ['Architecture contemporaine', 'Suite parentale', 'Cuisine professionnelle', 'Terrasse en bois précieux', 'Arbres fruitiers', 'Hauteur sous plafond 4m'],
@@ -240,10 +241,10 @@ export const mockProperties: Property[] = [
     floors: 0,
     yearBuilt: null,
     images: [
-      { id: 'img-4a', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=800&fit=crop', alt: 'Vue panoramique du terrain', isPrimary: true, order: 0 },
-      { id: 'img-4b', url: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=1200&h=800&fit=crop', alt: 'Environnement naturel du terrain', isPrimary: false, order: 1 },
-      { id: 'img-4c', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1200&h=800&fit=crop', alt: 'Accès routier au terrain', isPrimary: false, order: 2 },
-      { id: 'img-4d', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&h=800&fit=crop', alt: 'Proximité plage de Dar Bouazza', isPrimary: false, order: 3 },
+      { id: 'img-4a', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=70', alt: 'Vue panoramique du terrain', isPrimary: true, order: 0 },
+      { id: 'img-4b', url: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1600&q=70', alt: 'Environnement naturel du terrain', isPrimary: false, order: 1 },
+      { id: 'img-4c', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1600&q=70', alt: 'Accès routier au terrain', isPrimary: false, order: 2 },
+      { id: 'img-4d', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=1600&q=70', alt: 'Proximité plage de Dar Bouazza', isPrimary: false, order: 3 },
     ],
     amenities: ['Viabilisation en cours', 'Accès route bitumée', 'Zone en développement', 'Proximité plage'],
     features: ['Certificat.constructibilité', '800 m²', 'Zone résidentielle', 'Proximité autoroute A5'],
@@ -267,6 +268,7 @@ export const mockProperties: Property[] = [
     description:
       "Magnifique appartement avec vue panoramique sur l'océan Atlantique, situé dans le prestigieux quartier d'Ain Diab à Casablanca. Cet appartement de standing offre une vue imprenable sur la mer depuis la terrasse spacieuse idéale pour profiter des couchers de soleil. L'espace de vie est lumineux et aéré avec de grandes baies vitrées, un parquet en chêne et une décoration contemporaine élégante. La cuisine est entièrement équipée avec des appareils haut de gamme. Le quartier d'Ain Diab, longeant la corniche, offre un cadre de vie unique avec ses promenades bordées de palmiers, ses restaurants face à la mer et ses plages accessibles à pied.",
     price: 2100000,
+    previousPrice: 2450000,
     category: PropertyCategory.APARTMENT,
     status: PropertyStatus.PUBLISHED,
     address: {
@@ -284,10 +286,10 @@ export const mockProperties: Property[] = [
     floors: 8,
     yearBuilt: 2021,
     images: [
-      { id: 'img-5a', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&h=800&fit=crop', alt: 'Vue mer depuis la terrasse', isPrimary: true, order: 0 },
-      { id: 'img-5b', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop', alt: 'Salon avec grandes baies vitrées', isPrimary: false, order: 1 },
-      { id: 'img-5c', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop', alt: 'Chambre avec vue océan', isPrimary: false, order: 2 },
-      { id: 'img-5d', url: 'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1200&h=800&fit=crop', alt: 'Terrasse panoramique', isPrimary: false, order: 3 },
+      { id: 'img-5a', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=70', alt: 'Vue mer depuis la terrasse', isPrimary: true, order: 0 },
+      { id: 'img-5b', url: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdbc?auto=format&fit=crop&w=1600&q=70', alt: 'Salon avec grandes baies vitrées', isPrimary: false, order: 1 },
+      { id: 'img-5c', url: 'https://images.unsplash.com/photo-1600585153490-76fb20a32601?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre avec vue océan', isPrimary: false, order: 2 },
+      { id: 'img-5d', url: 'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?auto=format&fit=crop&w=1600&q=70', alt: 'Terrasse panoramique', isPrimary: false, order: 3 },
     ],
     amenities: ['Parking souterrain', 'Ascenseur', 'Gardien 24h/24', 'Climatisation', 'Store électrique', 'Vue mer panoramique'],
     features: ['Vue mer panoramique', 'Terrasse spacieuse', 'Baies vitrées', 'Parquet chêne', 'Proximité plage'],
@@ -328,11 +330,11 @@ export const mockProperties: Property[] = [
     floors: 2,
     yearBuilt: 2019,
     images: [
-      { id: 'img-6a', url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop', alt: 'Cour intérieure avec fontaine', isPrimary: true, order: 0 },
-      { id: 'img-6b', url: 'https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=1200&h=800&fit=crop', alt: 'Piscine bordée de tadelakt', isPrimary: false, order: 1 },
-      { id: 'img-6c', url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=800&fit=crop', alt: 'Chambre traditionnelle décorée', isPrimary: false, order: 2 },
-      { id: 'img-6d', url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&h=800&fit=crop', alt: 'Jardin d\'agrumes et de roses', isPrimary: false, order: 3 },
-      { id: 'img-6e', url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=800&fit=crop', alt: 'Salon avec zelliges', isPrimary: false, order: 4 },
+      { id: 'img-6a', url: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1600&q=70', alt: 'Cour intérieure avec fontaine', isPrimary: true, order: 0 },
+      { id: 'img-6b', url: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1600&q=70', alt: 'Piscine bordée de tadelakt', isPrimary: false, order: 1 },
+      { id: 'img-6c', url: 'https://images.unsplash.com/photo-1600607687644-c7171b42498b?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre traditionnelle décorée', isPrimary: false, order: 2 },
+      { id: 'img-6d', url: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1600&q=70', alt: 'Jardin d\'agrumes et de roses', isPrimary: false, order: 3 },
+      { id: 'img-6e', url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=70', alt: 'Salon avec zelliges', isPrimary: false, order: 4 },
     ],
     amenities: ['Piscine', 'Jardin d\'agrumes', 'Riad intérieur', 'Climatisation', 'Cheminée traditionnelle', 'Artisanat local'],
     features: ['Architecture traditionnelle', 'Zelliges et moucharabiehs', 'Tadelakt', 'Textiles artisanaux', 'Patio ombragé'],
@@ -373,10 +375,10 @@ export const mockProperties: Property[] = [
     floors: 4,
     yearBuilt: 2021,
     images: [
-      { id: 'img-7a', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop', alt: 'Salon moderne meublé', isPrimary: true, order: 0 },
-      { id: 'img-7b', url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop', alt: 'Chambre avec rangements', isPrimary: false, order: 1 },
-      { id: 'img-7c', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=800&fit=crop', alt: 'Cuisine équipée moderne', isPrimary: false, order: 2 },
-      { id: 'img-7d', url: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&h=800&fit=crop', alt: 'Coin bureau intégré', isPrimary: false, order: 3 },
+      { id: 'img-7a', url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1600&q=70', alt: 'Salon moderne meublé', isPrimary: true, order: 0 },
+      { id: 'img-7b', url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre avec rangements', isPrimary: false, order: 1 },
+      { id: 'img-7c', url: 'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine équipée moderne', isPrimary: false, order: 2 },
+      { id: 'img-7d', url: 'https://images.unsplash.com/photo-1560448075-bb485b067938?auto=format&fit=crop&w=1600&q=70', alt: 'Coin bureau intégré', isPrimary: false, order: 3 },
     ],
     amenities: ['Parking souterrain', 'Ascenseur', 'Climatisation', 'Meublé design', 'Internet fibre optique', 'Interphone'],
     features: ['Meublé design', 'Coin bureau', 'Proximité Anfa Place', 'Éclairage LED', 'Meubles sur mesure'],
@@ -417,10 +419,10 @@ export const mockProperties: Property[] = [
     floors: 1,
     yearBuilt: 2024,
     images: [
-      { id: 'img-8a', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&h=800&fit=crop', alt: 'Espace commercial lumineux', isPrimary: true, order: 0 },
-      { id: 'img-8b', url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200&h=800&fit=crop', alt: 'Façade vitrée sur rue', isPrimary: false, order: 1 },
-      { id: 'img-8c', url: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=1200&h=800&fit=crop', alt: 'Espace intérieur à aménager', isPrimary: false, order: 2 },
-      { id: 'img-8d', url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&h=800&fit=crop', alt: 'Immeuble moderne Maarif', isPrimary: false, order: 3 },
+      { id: 'img-8a', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=70', alt: 'Espace commercial lumineux', isPrimary: true, order: 0 },
+      { id: 'img-8b', url: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=70', alt: 'Façade vitrée sur rue', isPrimary: false, order: 1 },
+      { id: 'img-8c', url: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1600&q=70', alt: 'Espace intérieur à aménager', isPrimary: false, order: 2 },
+      { id: 'img-8d', url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1600&q=70', alt: 'Immeuble moderne Maarif', isPrimary: false, order: 3 },
     ],
     amenities: ['Façade vitrée', 'Plafonds hauts 4m', 'Ventilation industrielle', 'Raccordement triphasé', 'Accès service', 'Vidéosurveillance'],
     features: ['Neuf 2024', 'Excellente visibilité', 'Rez-de-chaussée', 'Zone commerciale premium', '200 m²'],
@@ -461,10 +463,10 @@ export const mockProperties: Property[] = [
     floors: 2,
     yearBuilt: 2018,
     images: [
-      { id: 'img-9a', url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop', alt: 'Façade de la villa familiale', isPrimary: true, order: 0 },
-      { id: 'img-9b', url: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&h=800&fit=crop', alt: 'Salon familial lumineux', isPrimary: false, order: 1 },
-      { id: 'img-9c', url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop', alt: 'Jardin arboré avec fruitiers', isPrimary: false, order: 2 },
-      { id: 'img-9d', url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop', alt: 'Terrasse avec salle à manger extérieure', isPrimary: false, order: 3 },
+      { id: 'img-9a', url: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=70', alt: 'Façade de la villa familiale', isPrimary: true, order: 0 },
+      { id: 'img-9b', url: 'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=70', alt: 'Salon familial lumineux', isPrimary: false, order: 1 },
+      { id: 'img-9c', url: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1600&q=70', alt: 'Jardin arboré avec fruitiers', isPrimary: false, order: 2 },
+      { id: 'img-9d', url: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1600&q=70', alt: 'Terrasse avec salle à manger extérieure', isPrimary: false, order: 3 },
     ],
     amenities: ['Jardin arboré', 'Terrasse', 'Double salon', 'Cuisine familiale', 'Buanderie', 'Climatisation'],
     features: ['Cadre familial', 'Quartier calme', 'Fruitiers', 'Proximité écoles', 'Accès tramway'],
@@ -505,9 +507,9 @@ export const mockProperties: Property[] = [
     floors: 0,
     yearBuilt: null,
     images: [
-      { id: 'img-10a', url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=800&fit=crop', alt: 'Vue du terrain agricole', isPrimary: true, order: 0 },
-      { id: 'img-10b', url: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1200&h=800&fit=crop', alt: 'Paysage agricole Settat', isPrimary: false, order: 1 },
-      { id: 'img-10c', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1200&h=800&fit=crop', alt: 'Accès route nationale', isPrimary: false, order: 2 },
+      { id: 'img-10a', url: 'https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=1600&q=70', alt: 'Vue du terrain agricole', isPrimary: true, order: 0 },
+      { id: 'img-10b', url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=70', alt: 'Paysage agricole Settat', isPrimary: false, order: 1 },
+      { id: 'img-10c', url: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=1600&q=70', alt: 'Accès route nationale', isPrimary: false, order: 2 },
     ],
     amenities: ['Ressources en eau souterraine', 'Accès route nationale', 'Terrain plat', 'Climat favorable'],
     features: ['2000 m²', 'Fertile', 'Proximité Casablanca', 'Zone agricole', 'Investissement'],
@@ -548,10 +550,10 @@ export const mockProperties: Property[] = [
     floors: 10,
     yearBuilt: 2023,
     images: [
-      { id: 'img-11a', url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&h=800&fit=crop', alt: 'Salon de luxe avec vue', isPrimary: true, order: 0 },
-      { id: 'img-11b', url: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&h=800&fit=crop', alt: 'Cuisine haut de gamme Miele', isPrimary: false, order: 1 },
-      { id: 'img-11c', url: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&h=800&fit=crop', alt: 'Suite parentale en marbre', isPrimary: false, order: 2 },
-      { id: 'img-11d', url: 'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?w=1200&h=800&fit=crop', alt: 'Terrasse panoramique', isPrimary: false, order: 3 },
+      { id: 'img-11a', url: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1600&q=70', alt: 'Salon de luxe avec vue', isPrimary: true, order: 0 },
+      { id: 'img-11b', url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine haut de gamme Miele', isPrimary: false, order: 1 },
+      { id: 'img-11c', url: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1600&q=70', alt: 'Suite parentale en marbre', isPrimary: false, order: 2 },
+      { id: 'img-11d', url: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=70', alt: 'Terrasse panoramique', isPrimary: false, order: 3 },
     ],
     amenities: ['Concierge', 'Piscine résidentielle', 'Salle de sport', 'Spa', 'Parking privatif', 'Climatisation réversible', 'Domotique'],
     features: ['Marbre de Carrare', 'Mobilier de créateurs', 'Cuisine Miele', 'Dressing sur mesure', 'Quartier exclusif'],
@@ -592,10 +594,10 @@ export const mockProperties: Property[] = [
     floors: 3,
     yearBuilt: 2022,
     images: [
-      { id: 'img-12a', url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&h=800&fit=crop', alt: 'Espace de vie du studio', isPrimary: true, order: 0 },
-      { id: 'img-12b', url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop', alt: 'Espace nuit séparé', isPrimary: false, order: 1 },
-      { id: 'img-12c', url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=800&fit=crop', alt: 'Cuisine ouverte équipée', isPrimary: false, order: 2 },
-      { id: 'img-12d', url: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&h=800&fit=crop', alt: 'Salle de bains moderne', isPrimary: false, order: 3 },
+      { id: 'img-12a', url: 'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?auto=format&fit=crop&w=1600&q=70', alt: 'Espace de vie du studio', isPrimary: true, order: 0 },
+      { id: 'img-12b', url: 'https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1600&q=70', alt: 'Espace nuit séparé', isPrimary: false, order: 1 },
+      { id: 'img-12c', url: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine ouverte équipée', isPrimary: false, order: 2 },
+      { id: 'img-12d', url: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1600&q=70', alt: 'Salle de bains moderne', isPrimary: false, order: 3 },
     ],
     amenities: ['Meublé', 'Climatisation', 'Internet fibre', 'Proximité tramway', 'Gardien', 'Cuisine équipée'],
     features: ['Fonctionnel', 'Meublé complet', 'Excellente localisation', 'Investissement locatif', 'Centre-ville'],
@@ -611,6 +613,94 @@ export const mockProperties: Property[] = [
     sellerId: 'seller-2',
     createdAt: '2026-03-15T08:00:00Z',
     updatedAt: '2026-04-12T16:30:00Z',
+  },
+  {
+    id: 'prop-13',
+    slug: 'appartement-gueliz-location',
+    title: 'Appartement meublé Guéliz',
+    description:
+      "Appartement meublé à louer à Guéliz, Marrakech. Séjour lumineux, deux chambres et balcon sur une rue calme, à quelques minutes de l'avenue Mohammed V. Idéal pour une installation ou une location de moyenne durée.",
+    price: 12000,
+    listing: 'rent',
+    category: PropertyCategory.APARTMENT,
+    status: PropertyStatus.PUBLISHED,
+    address: {
+      street: 'Rue Ibn Aicha, Guéliz',
+      city: 'Guéliz, Marrakech',
+      state: 'Marrakech-Safi',
+      zip: '40000',
+      country: 'Morocco',
+    },
+    latitude: 31.634,
+    longitude: -8.014,
+    surface: 95,
+    bedrooms: 2,
+    bathrooms: 1,
+    floors: 3,
+    yearBuilt: 2018,
+    images: [
+      { id: 'img-13a', url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=70', alt: 'Séjour de l’appartement Guéliz', isPrimary: true, order: 0 },
+      { id: 'img-13b', url: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre de l’appartement Guéliz', isPrimary: false, order: 1 },
+      { id: 'img-13c', url: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=70', alt: 'Cuisine de l’appartement Guéliz', isPrimary: false, order: 2 },
+    ],
+    amenities: ['Meublé', 'Climatisation', 'Balcon', 'Fibre'],
+    features: ['Quartier Guéliz', 'Meublé', 'Calme'],
+    isVerified: true,
+    isFurnished: true,
+    hasParking: false,
+    hasPool: false,
+    hasGarden: false,
+    hasTerrace: true,
+    isNewConstruction: false,
+    views: 86,
+    favoriteCount: 9,
+    sellerId: 'seller-2',
+    createdAt: '2026-10-02T08:00:00Z',
+    updatedAt: '2026-10-20T08:00:00Z',
+  },
+  {
+    id: 'prop-14',
+    slug: 'appartement-agdal-location',
+    title: 'Appartement Agdal à louer',
+    description:
+      "Trois pièces à louer dans l'Agdal, à Rabat. Immeuble gardienné, proche du tramway et des commerces. Salon donnant sur un balcon, deux chambres et une salle de bains.",
+    price: 15000,
+    listing: 'rent',
+    category: PropertyCategory.APARTMENT,
+    status: PropertyStatus.PUBLISHED,
+    address: {
+      street: 'Avenue Fal Ould Oumeir',
+      city: 'Agdal, Rabat',
+      state: 'Rabat-Salé-Kénitra',
+      zip: '10090',
+      country: 'Morocco',
+    },
+    latitude: 33.998,
+    longitude: -6.852,
+    surface: 110,
+    bedrooms: 2,
+    bathrooms: 2,
+    floors: 4,
+    yearBuilt: 2016,
+    images: [
+      { id: 'img-14a', url: 'https://images.unsplash.com/photo-1502672023488-70e25813eb80?auto=format&fit=crop&w=1600&q=70', alt: 'Salon de l’appartement Agdal', isPrimary: true, order: 0 },
+      { id: 'img-14b', url: 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1600&q=70', alt: 'Chambre de l’appartement Agdal', isPrimary: false, order: 1 },
+      { id: 'img-14c', url: 'https://images.unsplash.com/photo-1544984243-ec57ea16fe25?auto=format&fit=crop&w=1600&q=70', alt: 'Salle de bains Agdal', isPrimary: false, order: 2 },
+    ],
+    amenities: ['Gardien', 'Ascenseur', 'Balcon', 'Proche tramway'],
+    features: ['Agdal', 'Lumineux', 'Gardienné'],
+    isVerified: true,
+    isFurnished: false,
+    hasParking: true,
+    hasPool: false,
+    hasGarden: false,
+    hasTerrace: true,
+    isNewConstruction: false,
+    views: 64,
+    favoriteCount: 6,
+    sellerId: 'seller-1',
+    createdAt: '2026-09-18T08:00:00Z',
+    updatedAt: '2026-10-12T08:00:00Z',
   },
 ];
 
@@ -852,12 +942,18 @@ export function filterProperties(filters: PropertyFilters): Property[] {
     results = results.filter((p) => p.surface <= filters.maxSurface!);
   }
 
-  if (filters.bedrooms !== undefined) {
-    results = results.filter((p) => p.bedrooms === filters.bedrooms);
+  if (filters.intent === "rent") {
+    results = results.filter((p) => p.listing === "rent");
+  } else if (filters.intent === "sale") {
+    results = results.filter((p) => p.listing !== "rent");
   }
 
-  if (filters.bathrooms !== undefined) {
-    results = results.filter((p) => p.bathrooms === filters.bathrooms);
+  if (filters.bedrooms) {
+    results = results.filter((p) => p.bedrooms >= filters.bedrooms!);
+  }
+
+  if (filters.bathrooms) {
+    results = results.filter((p) => p.bathrooms >= filters.bathrooms!);
   }
 
   if (filters.isFurnished !== undefined) {

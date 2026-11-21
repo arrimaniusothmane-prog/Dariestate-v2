@@ -7,6 +7,8 @@ import { MapPin, Bath, BedDouble, Ruler, Heart, BadgeCheck, ArrowRight } from "l
 import type { Property } from "@/types";
 import { formatPrice, cn } from "@/lib/utils";
 import { categoryLabel } from "@/lib/labels";
+import { propertyHighlight, highlightLabel, showsRooms } from "@/lib/badges";
+import { useI18n } from "@/components/providers/i18n-provider";
 import { useFavorites } from "@/hooks/useProperties";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,6 +16,10 @@ export function PropertyListRow({ property }: { property: Property }) {
   const [imageError, setImageError] = useState(false);
   const { favorites, toggleFavorite } = useFavorites();
   const isFavorite = favorites.includes(property.id);
+  const { locale } = useI18n();
+  const highlight = propertyHighlight(property);
+  const rooms = showsRooms(property);
+  const perSqm = property.surface > 0 ? Math.round(property.price / property.surface) : null;
 
   const primaryImage = property.images.find((i) => i.isPrimary) ?? property.images[0];
 
@@ -36,8 +42,8 @@ export function PropertyListRow({ property }: { property: Property }) {
             {categoryLabel[property.category]}
           </div>
         )}
-        <Badge className="pointer-events-none absolute left-3 top-3 bg-black/40 text-white backdrop-blur-md">
-          {categoryLabel[property.category]}
+        <Badge className="pointer-events-none absolute left-3 top-3 bg-white text-hof">
+          {highlight ? highlightLabel[highlight][locale] : categoryLabel[property.category]}
         </Badge>
         <button
           onClick={() => toggleFavorite(property.id)}
@@ -69,9 +75,15 @@ export function PropertyListRow({ property }: { property: Property }) {
               {property.address.city}
             </p>
           </div>
-          <p className="shrink-0 font-display text-xl font-semibold text-primary">
-            {formatPrice(property.price)}
-          </p>
+          <div className="shrink-0 text-right">
+            <p className="font-display text-xl font-semibold text-primary">
+              {formatPrice(property.price)}
+              {property.listing === "rent" ? " / mois" : ""}
+            </p>
+            {perSqm !== null && (
+              <p className="text-xs text-muted-foreground">{formatPrice(perSqm)} / m²</p>
+            )}
+          </div>
         </div>
 
         <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
@@ -82,12 +94,12 @@ export function PropertyListRow({ property }: { property: Property }) {
           <span className="flex items-center gap-1.5">
             <Ruler className="size-4" /> {property.surface} m²
           </span>
-          {property.bedrooms > 0 && (
+          {rooms && property.bedrooms > 0 && (
             <span className="flex items-center gap-1.5">
               <BedDouble className="size-4" /> {property.bedrooms} ch
             </span>
           )}
-          {property.bathrooms > 0 && (
+          {rooms && property.bathrooms > 0 && (
             <span className="flex items-center gap-1.5">
               <Bath className="size-4" /> {property.bathrooms} sdb
             </span>

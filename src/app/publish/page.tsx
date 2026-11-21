@@ -131,7 +131,7 @@ export default function PublishPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+            <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
               Comment ça marche
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
@@ -198,7 +198,7 @@ export default function PublishPage() {
       <section id="conditions" className="py-20 scroll-mt-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+            <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
               Conditions
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">

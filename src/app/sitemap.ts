@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getProperties } from "@/services/propertyService";
 import { siteUrl } from "@/lib/seo";
+import { landings } from "@/lib/landings";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl;
@@ -18,6 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/favorites`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/about`, changeFrequency: "yearly", priority: 0.5 },
     { url: `${baseUrl}/contact`, changeFrequency: "yearly", priority: 0.5 },
+    { url: `${baseUrl}/estimer`, changeFrequency: "monthly", priority: 0.6 },
+    ...landings.map((landing) => ({
+      url: `${baseUrl}/immobilier/${landing.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     { url: `${baseUrl}/help`, changeFrequency: "monthly", priority: 0.5 },
   ];
 

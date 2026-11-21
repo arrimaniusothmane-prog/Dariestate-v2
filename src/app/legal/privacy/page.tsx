@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { agency } from "@/lib/agency";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
@@ -58,7 +59,7 @@ const sections = [
   {
     title: "7. Contact",
     paragraphs: [
-      "Pour toute question relative à la présente Politique de confidentialité ou à l'exercice de vos droits, vous pouvez contacter notre Délégué à la Protection des Données : DarEstate SARL — DPO, Twin Center, Bureau 1204, Boulevard Zerktouni, Casablanca, Maroc. E-mail : dpo@darestate.ma. Téléphone : +212 5 22 00 00 00.",
+      `Pour toute question relative à la présente Politique de confidentialité ou à l'exercice de vos droits, vous pouvez contacter notre Délégué à la Protection des Données : DarEstate SARL — DPO, Twin Center, Bureau 1204, Boulevard Zerktouni, Casablanca, Maroc. E-mail : dpo@darestate.ma. Téléphone : ${agency.phoneDisplay}.`,
       "Nous nous engageons à traiter votre demande dans les meilleurs délais et à vous fournir une réponse motivée. Si vous estimez que le traitement de vos données n'est pas conforme à la législation applicable, vous avez le droit d'introduire une réclamation auprès de l'autorité de contrôle compétente.",
     ],
   },
@@ -69,7 +70,7 @@ export default function PrivacyPage() {
     <div className="bg-background py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+          <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
             Données personnelles
           </span>
           <h1 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">

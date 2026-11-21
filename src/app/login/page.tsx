@@ -3,12 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building2, Eye, EyeOff, Loader2, Lock, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  Eye,
+  EyeOff,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,110 +43,153 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-24 sm:px-6 lg:flex-row lg:justify-between lg:px-8">
-      {/* Left brand panel */}
-      <div className="mb-10 hidden max-w-md lg:block">
-        <div className="flex items-center gap-3">
-          <span className="flex size-12 items-center justify-center rounded-2xl bg-primary">
-            <Building2 className="size-6 text-gold" />
+    <div className="grid min-h-screen lg:grid-cols-2">
+      <aside className="relative hidden flex-col justify-between bg-[#111111] px-12 py-12 text-white lg:flex">
+        <Link href="/" className="inline-flex items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-white text-[#111111]">
+            <Building2 className="size-5" />
           </span>
-          <span className="font-display text-3xl font-semibold">
-            Dar<span className="text-gold">Estate</span>
+          <span className="text-lg font-semibold tracking-tight">
+            DarEstate
           </span>
+        </Link>
+
+        <div className="max-w-md">
+          <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight xl:text-5xl">
+            Votre espace pour suivre chaque projet immobilier.
+          </h1>
+          <p className="mt-5 text-base leading-relaxed text-white/70">
+            Favoris, visites, offres et annonces — un seul accès, clair et
+            sécurisé.
+          </p>
         </div>
-        <h1 className="mt-8 font-display text-4xl font-semibold leading-tight">
-          Retrouvez le compte qui gère votre projet immobilier.
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          Accédez à vos favoris, vos demandes de visite, vos offres et pilotez
-          vos transactions en toute simplicité.
-        </p>
-        <div className="mt-8 flex items-center gap-2 rounded-xl bg-sand px-4 py-3 text-sm">
-          <ShieldCheck className="size-4 text-gold" />
+
+        <p className="inline-flex items-center gap-2 text-sm text-white/60">
+          <ShieldCheck className="size-4" />
           Connexion sécurisée · Données protégées
-        </div>
-      </div>
+        </p>
+      </aside>
 
-      {/* Right form panel */}
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center lg:hidden">
-          <span className="font-display text-2xl font-semibold">
-            Dar<span className="text-gold">Estate</span>
-          </span>
+      <main className="flex flex-col bg-white px-6 py-10 sm:px-10 lg:px-16 lg:py-12">
+        <div className="mb-10 flex items-center justify-between lg:mb-0">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#111111] transition-opacity hover:opacity-70 lg:hidden"
+          >
+            <Building2 className="size-4" />
+            DarEstate
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-[#111111]"
+          >
+            <ArrowLeft className="size-3.5" />
+            Accueil
+          </Link>
         </div>
 
-        <div className="rounded-3xl border border-border/60 bg-card p-8 shadow-sm">
-          <h2 className="font-display text-2xl font-semibold">Connexion</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Ravi de vous revoir. Entrez vos identifiants.
+        <div className="mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center">
+          <h2 className="text-3xl font-semibold tracking-tight text-[#111111]">
+            Connexion
+          </h2>
+          <p className="mt-2 text-sm text-neutral-500">
+            Entrez votre e-mail et votre mot de passe.
           </p>
 
           {error && (
-            <Alert variant="destructive" className="mt-5">
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-[#111111]"
+            >
               {error}
-            </Alert>
+            </p>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1.5 block text-sm font-medium text-[#111111]"
+              >
+                E-mail
+              </label>
+              <input
                 id="email"
                 type="email"
                 required
+                autoComplete="email"
                 placeholder="vous@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11"
+                className="h-12 w-full rounded-xl border border-neutral-200 bg-white px-4 text-sm text-[#111111] outline-none placeholder:text-neutral-400 focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/15"
               />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
+
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-[#111111]"
+                >
+                  Mot de passe
+                </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs font-medium text-gold hover:underline"
+                  className="text-xs font-medium text-neutral-500 underline-offset-2 hover:text-[#111111] hover:underline"
                 >
                   Mot de passe oublié ?
                 </Link>
               </div>
               <div className="relative">
-                <Input
+                <input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-11 pr-10"
+                  className="h-12 w-full rounded-xl border border-neutral-200 bg-white px-4 pr-11 text-sm text-[#111111] outline-none placeholder:text-neutral-400 focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/15"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Masquer" : "Afficher"}
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 transition-colors hover:text-[#111111]"
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                 >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {showPassword ? (
+                    <EyeOff className="size-4" />
+                  ) : (
+                    <Eye className="size-4" />
+                  )}
                 </button>
               </div>
             </div>
 
-            <Button
+            <button
               type="submit"
-              className="w-full rounded-full py-6"
               disabled={loading}
+              className="flex h-12 w-full items-center justify-center rounded-full bg-[#111111] text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading && <Loader2 className="mr-2 size-4 animate-spin" />}
-              Se connecter
-            </Button>
+              {loading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "Se connecter"
+              )}
+            </button>
           </form>
 
-          <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-sand/60 px-4 py-3 text-center text-sm text-muted-foreground">
-            <Lock className="size-4 shrink-0 text-gold" />
-            Accès réservé à l&apos;administrateur de la plateforme.
-          </div>
+          <p className="mt-8 text-center text-sm text-neutral-500">
+            Pas encore de compte ?{" "}
+            <Link
+              href="/register"
+              className="font-medium text-[#111111] underline-offset-2 hover:underline"
+            >
+              Voir les options
+            </Link>
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

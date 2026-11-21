@@ -6,6 +6,7 @@ import {
   SlidersHorizontal,
   LayoutGrid,
   List,
+  Map as MapIcon,
   Search,
   X,
   MapPin,
@@ -22,6 +23,9 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { ResultsMap } from "@/components/property/property-map";
+import { NotifyForm } from "@/components/forms/notify-form";
+import { SheetClose } from "@/components/ui/sheet";
 
 const categories: { value: string; label: string }[] = [
   { value: "", label: "Tous les types" },
@@ -36,8 +40,11 @@ const sortOptions = [
   { value: "newest", label: "Plus récents" },
   { value: "price-asc", label: "Prix : croissant" },
   { value: "price-desc", label: "Prix : décroissant" },
+  { value: "surface-asc", label: "Surface : croissante" },
   { value: "surface-desc", label: "Surface : décroissante" },
 ];
+
+const PAGE_SIZE = 9;
 
 export function PropertiesView({
   searchParams,
@@ -49,7 +56,9 @@ export function PropertiesView({
   const [filters, setFilters] = useState<PropertyFilters>(() =>
     normalizeFilters(searchParams)
   );
-  const [view, setView] = useState<"grid" | "list">("grid");
+  const [view, setView] = useState<"grid" | "list" | "map">("grid");
+  const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParams.search ?? "");
 
   const { properties, loading } = useSearchProperties(filters);
@@ -73,11 +82,13 @@ export function PropertiesView({
     if (f.isNewConstruction) params.set("newConstruction", "true");
     if (f.isVerified) params.set("verified", "true");
     if (f.sortBy) params.set("sortBy", f.sortBy);
+    if (f.intent) params.set("intent", f.intent);
     const qs = params.toString();
     router.replace(qs ? `/properties?${qs}` : "/properties", { scroll: false });
   }, [router]);
 
   const updateFilters = useCallback((patch: Partial<PropertyFilters>) => {
+    setPage(1);
     setFilters((prev) => ({ ...prev, ...patch }));
   }, []);
 
@@ -97,10 +108,12 @@ export function PropertiesView({
     updateFilters({ search: searchInput });
   };
 
-  const resultRange = useMemo(() => {
-    const total = properties.length;
-    return total;
-  }, [properties]);
+  const pageCount = Math.max(1, Math.ceil(properties.length / PAGE_SIZE));
+  const visible = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return properties.slice(start, start + PAGE_SIZE);
+  }, [properties, page]);
+  const resultRange = properties.length;
 
   const filtersContent = (
     <div className="space-y-6">
@@ -222,13 +235,13 @@ export function PropertiesView({
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-24 pt-24 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 pb-28 pt-24 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+        <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
           Le marché
         </span>
         <h1 className="mt-2 font-display text-2xl font-semibold sm:text-3xl">
-          {properties.length} biens disponibles
+          {loading ? "Biens disponibles" : `${properties.length} bien${properties.length > 1 ? "s" : ""} disponible${properties.length > 1 ? "s" : ""}`}
         </h1>
       </div>
 
@@ -238,12 +251,12 @@ export function PropertiesView({
           <div className="sticky top-20 rounded-2xl border border-border/60 bg-card p-5">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-display font-semibold">
-                <SlidersHorizontal className="size-4 text-gold-strong" /> Filtres
+                <SlidersHorizontal className="size-4 text-hof" /> Filtres
               </h2>
               {activeFilterCount > 0 && (
                 <button
                   onClick={clearAll}
-                  className="flex items-center gap-1 text-xs font-medium text-gold-strong hover:underline"
+                  className="flex items-center gap-1 text-xs font-medium text-hof hover:underline"
                 >
                   <X className="size-3" /> Réinitialiser
                 </button>
@@ -280,17 +293,24 @@ export function PropertiesView({
             <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
               <button
                 onClick={() => setView("grid")}
-                className={cn("rounded-full p-2 transition-colors", view === "grid" ? "bg-gold text-ink" : "text-muted-foreground hover:text-foreground")}
+                className={cn("rounded-full p-2 transition-colors", view === "grid" ? "bg-gold text-white" : "text-muted-foreground hover:text-foreground")}
                 aria-label="Vue grille"
               >
                 <LayoutGrid className="size-4" />
               </button>
               <button
                 onClick={() => setView("list")}
-                className={cn("rounded-full p-2 transition-colors", view === "list" ? "bg-gold text-ink" : "text-muted-foreground hover:text-foreground")}
+                className={cn("rounded-full p-2 transition-colors", view === "list" ? "bg-gold text-white" : "text-muted-foreground hover:text-foreground")}
                 aria-label="Vue liste"
               >
                 <List className="size-4" />
+              </button>
+              <button
+                onClick={() => setView("map")}
+                className={cn("rounded-full p-2 transition-colors", view === "map" ? "bg-gold text-white" : "text-muted-foreground hover:text-foreground")}
+                aria-label="Vue carte"
+              >
+                <MapIcon className="size-4" />
               </button>
             </div>
 
@@ -304,7 +324,7 @@ export function PropertiesView({
           </div>
 
           {/* Mobile filter trigger */}
-          <Sheet>
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
             <SheetTrigger
               render={
                 <Button
@@ -324,18 +344,33 @@ export function PropertiesView({
                   </span>
                 </SheetTitle>
               </SheetHeader>
-              <div className="mt-4 pb-6">{filtersContent}</div>
-              <div className="sticky bottom-0 -mx-4 border-t border-border bg-background/90 px-4 pt-3 backdrop-blur">
-                <Button
-                  onClick={clearAll}
-                  variant="ghost"
-                  className="w-full rounded-full"
+              <div className="mt-4 pb-24">{filtersContent}</div>
+              <div className="sticky bottom-0 -mx-4 border-t border-border bg-background px-4 py-3">
+                <SheetClose
+                  render={<Button className="w-full rounded-full bg-[#111111] text-white" />}
                 >
-                  Réinitialiser tous les filtres
-                </Button>
+                  Voir {resultRange} résultat{resultRange > 1 ? "s" : ""}
+                </SheetClose>
               </div>
             </SheetContent>
           </Sheet>
+
+          {chips(filters, updateFilters).length > 0 && (
+            <ul className="mb-4 flex flex-wrap gap-2">
+              {chips(filters, updateFilters).map((chip) => (
+                <li key={chip.key}>
+                  <button
+                    type="button"
+                    onClick={chip.clear}
+                    className="inline-flex items-center gap-1 rounded-full bg-bebe px-3 py-1 text-xs font-medium text-hof"
+                  >
+                    {chip.label}
+                    <X className="size-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
 
           {/* Results count per query */}
           <p className="mb-4 text-sm text-muted-foreground">
@@ -358,18 +393,46 @@ export function PropertiesView({
             </div>
           ) : properties.length === 0 ? (
             <EmptyState onReset={clearAll} />
+          ) : view === "map" ? (
+            <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+              <div className="grid gap-6 sm:grid-cols-2">
+                {visible.map((p) => (
+                  <PropertyCard key={p.id} property={p} />
+                ))}
+              </div>
+              <ResultsMap properties={properties} />
+            </div>
           ) : view === "grid" ? (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {properties.map((p) => (
+              {visible.map((p) => (
                 <PropertyCard key={p.id} property={p} />
               ))}
             </div>
           ) : (
             <div className="space-y-4">
-              {properties.map((p) => (
+              {visible.map((p) => (
                 <PropertyListRow key={p.id} property={p} />
               ))}
             </div>
+          )}
+
+          {properties.length > PAGE_SIZE && (
+            <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
+              {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setPage(n)}
+                  aria-current={n === page ? "page" : undefined}
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full text-sm font-semibold",
+                    n === page ? "bg-[#111111] text-white" : "bg-card text-hof hover:bg-bebe"
+                  )}
+                >
+                  {n}
+                </button>
+              ))}
+            </nav>
           )}
         </div>
       </div>
@@ -401,6 +464,7 @@ function normalizeFilters(
     isVerified: sp.verified === "true" ? true : sp.isVerified === "true" ? true : undefined,
     status: undefined,
     sortBy: sp.sortBy || "newest",
+    intent: sp.intent === "rent" || sp.intent === "sale" ? sp.intent : undefined,
   };
 }
 
@@ -424,6 +488,7 @@ function defaultFilters(): PropertyFilters {
     isVerified: undefined,
     status: undefined,
     sortBy: "newest",
+    intent: undefined,
   };
 }
 
@@ -431,7 +496,7 @@ function countActive(f: PropertyFilters): number {
   const checks = [
     f.search, f.city, f.category, f.minPrice, f.maxPrice, f.minSurface,
     f.maxSurface, f.bedrooms, f.bathrooms, f.isFurnished, f.hasParking,
-    f.hasPool, f.hasGarden, f.hasTerrace, f.isNewConstruction, f.isVerified,
+    f.hasPool, f.hasGarden, f.hasTerrace, f.isNewConstruction, f.isVerified, f.intent,
   ];
   return checks.filter(Boolean).length;
 }
@@ -533,6 +598,25 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       <Button onClick={onReset} className="mt-6 rounded-full">
         Réinitialiser la recherche
       </Button>
+      <div className="mt-8 w-full max-w-md text-left">
+        <p className="mb-2 text-sm font-semibold text-hof">Être prévenu dès qu’un bien correspond</p>
+        <NotifyForm subject="Recherche personnalisée" tone="light" />
+      </div>
     </div>
   );
+}
+
+function chips(
+  f: PropertyFilters,
+  update: (patch: Partial<PropertyFilters>) => void
+) {
+  const items: { key: string; label: string; clear: () => void }[] = [];
+  if (f.intent) items.push({ key: "intent", label: f.intent === "rent" ? "Location" : "Achat", clear: () => update({ intent: undefined }) });
+  if (f.city) items.push({ key: "city", label: f.city, clear: () => update({ city: undefined }) });
+  if (f.category) items.push({ key: "category", label: f.category, clear: () => update({ category: undefined }) });
+  if (f.minPrice) items.push({ key: "min", label: `Dès ${f.minPrice} MAD`, clear: () => update({ minPrice: undefined }) });
+  if (f.maxPrice) items.push({ key: "max", label: `Jusqu’à ${f.maxPrice} MAD`, clear: () => update({ maxPrice: undefined }) });
+  if (f.bedrooms) items.push({ key: "beds", label: `${f.bedrooms}+ chambres`, clear: () => update({ bedrooms: undefined }) });
+  if (f.isVerified) items.push({ key: "verified", label: "Vérifiés", clear: () => update({ isVerified: undefined }) });
+  return items;
 }

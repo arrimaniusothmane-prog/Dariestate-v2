@@ -141,7 +141,7 @@ export default function AdminOverviewPage() {
               <Link key={m.role} href={m.href} className="group">
                 <div className="flex h-full flex-col rounded-2xl border border-border/60 bg-sand/40 p-5 transition-colors group-hover:border-gold/40">
                   <div className="flex items-center justify-between">
-                    <div className="flex size-11 items-center justify-center rounded-xl bg-gold/15 text-gold-strong transition-colors group-hover:bg-gold group-hover:text-ink">
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-gold/15 text-gold-strong transition-colors group-hover:bg-gold group-hover:text-white">
                       <Icon className="size-5" />
                     </div>
                     <span className="tnum font-display text-2xl font-semibold">{m.count}</span>

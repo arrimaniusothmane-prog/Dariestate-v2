@@ -57,7 +57,7 @@ export default function SellPage() {
           sizes="100vw"
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/75 via-[#0a0a0a]/50 to-[#0a0a0a]/30" />
         <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">
@@ -92,7 +92,7 @@ export default function SellPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+            <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
               Pourquoi vendre ici
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">
@@ -128,7 +128,7 @@ export default function SellPage() {
       <section className="bg-ink py-20 text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+            <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
               Un modèle transparent
             </span>
             <h2 className="mt-3 font-display text-3xl font-semibold">

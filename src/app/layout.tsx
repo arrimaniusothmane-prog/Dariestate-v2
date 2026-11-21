@@ -1,26 +1,30 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Playfair_Display } from "next/font/google";
+import { DM_Sans, Inter, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/components/providers/app-providers";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { organizationJsonLd } from "@/lib/schema";
+import { DEFAULT_THEME, THEME_INIT_SCRIPT } from "@/lib/theme";
 
-const inter = Inter({
+const sans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-sans-default",
   display: "swap",
 });
 
-const manrope = Manrope({
+const programaSans = Inter({
   subsets: ["latin"],
-  variable: "--font-heading",
+  variable: "--font-programa",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-serif",
+const arabic = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-arabic",
   display: "swap",
 });
 
@@ -86,23 +90,35 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="fr"
       dir="ltr"
-      className={`${inter.variable} ${manrope.variable} ${playfair.variable} h-full antialiased`}
+      data-theme={DEFAULT_THEME}
+      suppressHydrationWarning
+      className={`${sans.variable} ${programaSans.variable} ${arabic.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
-        <AppProviders>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink"
-          >
-            Aller au contenu principal
-          </a>
-          <Navbar />
-          <main id="main-content" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-          <MobileNav />
-        </AppProviders>
+        <ThemeProvider>
+          <AppProviders>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+            >
+              Aller au contenu principal
+            </a>
+            <Navbar />
+            <main id="main-content" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+            <WhatsAppButton />
+            <MobileNav />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+            />
+          </AppProviders>
+        </ThemeProvider>
       </body>
     </html>
   );

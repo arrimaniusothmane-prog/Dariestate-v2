@@ -25,12 +25,14 @@ import {
 import Link from "next/link";
 import { createDemande } from "@/services/demandeService";
 import { DemandeType } from "@/types";
+import { agency, telHref } from "@/lib/agency";
 
 const contactCards = [
   {
     icon: Phone,
     title: "Téléphone",
-    lines: ["+212 5 22 00 00 00"],
+    lines: [agency.phoneDisplay],
+    href: telHref(),
   },
   {
     icon: Mail,
@@ -105,7 +107,7 @@ export function ContactForm() {
   return (
     <div>
       {/* Header */}
-      <section className="relative overflow-hidden bg-ink py-16">
+      <section className="relative overflow-hidden bg-[#111111] pt-24 pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md">

@@ -132,6 +132,8 @@ export const demandeTypeLabel: Record<DemandeType, string> = {
   [DemandeType.VISITE]: "Demande de visite",
   [DemandeType.OFFRE]: "Offre d'achat",
   [DemandeType.PUBLICATION]: "Publication de bien",
+  [DemandeType.ALERTE]: "Alerte bien",
+  [DemandeType.ESTIMATION]: "Estimation",
 };
 
 export const demandeTypeBadge: Record<DemandeType, string> = {
@@ -141,6 +143,8 @@ export const demandeTypeBadge: Record<DemandeType, string> = {
   [DemandeType.VISITE]: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
   [DemandeType.OFFRE]: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
   [DemandeType.PUBLICATION]: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300",
+  [DemandeType.ALERTE]: "bg-teal-100 text-teal-800 dark:bg-teal-500/15 dark:text-teal-200",
+  [DemandeType.ESTIMATION]: "bg-stone-200 text-stone-800 dark:bg-stone-500/20 dark:text-stone-200",
 };
 
 export const demandeStatusLabel: Record<DemandeStatus, string> = {

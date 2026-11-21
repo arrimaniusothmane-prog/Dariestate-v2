@@ -74,7 +74,7 @@ export function DashboardShell({
                     </span>
                     {item.badge}
                     {badge && active && !item.badge && (
-                      <span className="ml-auto rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-ink">
+                      <span className="ml-auto rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-white">
                         {badge}
                       </span>
                     )}
@@ -131,7 +131,7 @@ export function StatCard({
         <div
           className={cn(
             "flex size-10 items-center justify-center rounded-xl",
-            accent ? "bg-gold text-ink" : "bg-sand text-gold-strong"
+            accent ? "bg-gold text-white" : "bg-sand text-gold-strong"
           )}
         >
           <Icon className="size-5" />

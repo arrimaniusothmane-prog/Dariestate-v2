@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Découvrez des appartements, villas et terrains sélectionnés au Maroc.",
     start_url: "/",
     display: "standalone",
-    background_color: "#faf8f3",
-    theme_color: "#131e26",
+    background_color: "#ffffff",
+    theme_color: "#111111",
     icons: [
       {
         src: "/icon.svg",

@@ -12,6 +12,7 @@ import {
   Building2,
   Phone,
   Mail,
+  MessageCircle,
   Check,
   ShieldCheck,
   Factory,
@@ -26,6 +27,12 @@ import { RequestVisitModal } from "@/components/modals/request-visit-modal";
 import { MakeOfferModal } from "@/components/modals/make-offer-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MortgageCalculator } from "@/components/property/mortgage-calculator";
+import { PropertyMap } from "@/components/property/property-map";
+import { PropertyCard } from "@/components/property/property-card";
+import { useProperties } from "@/hooks/useProperties";
+import { agency, telHref, whatsappHref } from "@/lib/agency";
+import { showsRooms } from "@/lib/badges";
 
 export function PropertyDetail({ property }: { property: Property }) {
   const [contactOpen, setContactOpen] = useState(false);
@@ -35,6 +42,17 @@ export function PropertyDetail({ property }: { property: Property }) {
 
   const seller = property.seller;
   const isLand = property.category === "LAND";
+  const rooms = showsRooms(property);
+  const phone = seller?.phone && !seller.phone.includes("00 00 00") ? seller.phone : agency.phoneDisplay;
+  const waText = `Bonjour DarEstate, je souhaite visiter « ${property.title} » à ${property.address.city}.`;
+  const { properties } = useProperties();
+  const similar = properties
+    .filter(
+      (item) =>
+        item.id !== property.id &&
+        (item.category === property.category || item.address.city === property.address.city)
+    )
+    .slice(0, 3);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-32 pt-24 sm:px-6 lg:px-8">
@@ -55,7 +73,7 @@ export function PropertyDetail({ property }: { property: Property }) {
               {categoryLabel[property.category]}
             </Badge>
             {property.isVerified && (
-              <Badge className="bg-[oklch(0.85_0.04_150)] text-[oklch(0.35_0.08_150)] hover:bg-[oklch(0.82_0.04_150)]">
+              <Badge className="bg-gold/15 text-gold-strong hover:bg-gold/25">
                 <BadgeCheck className="mr-1 size-3.5" /> Bien vérifié
               </Badge>
             )}
@@ -81,8 +99,8 @@ export function PropertyDetail({ property }: { property: Property }) {
       {/* Key stats */}
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard icon={Ruler} label="Surface" value={`${property.surface} m²`} />
-        {!isLand && <StatCard icon={BedDouble} label="Chambres" value={String(property.bedrooms)} />}
-        {!isLand && <StatCard icon={Bath} label="Salles de bain" value={String(property.bathrooms)} />}
+        {rooms && property.bedrooms > 0 && <StatCard icon={BedDouble} label="Chambres" value={String(property.bedrooms)} />}
+        {rooms && property.bathrooms > 0 && <StatCard icon={Bath} label="Salles de bain" value={String(property.bathrooms)} />}
         <StatCard icon={CalendarRange} label="Année" value={property.yearBuilt ? String(property.yearBuilt) : "—"} />
         {property.floors > 0 && <StatCard icon={Building2} label="Étages" value={String(property.floors)} />}
       </div>
@@ -133,22 +151,22 @@ export function PropertyDetail({ property }: { property: Property }) {
             </div>
           </section>
 
-          {/* Location */}
           <section className="mt-8">
             <h2 className="font-display text-xl font-semibold">Localisation</h2>
-            <div className="relative mt-4 overflow-hidden rounded-2xl border border-border">
-              <div className="flex h-64 w-full items-center justify-center bg-sand">
-                <div className="text-center">
-                  <MapPin className="mx-auto size-8 text-gold" />
-                  <p className="mt-2 font-medium">{property.address.city}</p>
-                  <p className="text-sm text-muted-foreground">{property.address.street}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {property.address.state} · {property.address.zip}, {property.address.country}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <PropertyMap
+              latitude={property.latitude}
+              longitude={property.longitude}
+              title={property.title}
+              city={property.address.city}
+            />
           </section>
+
+          <section className="mt-8">
+            <h2 className="font-display text-xl font-semibold">Plan indicatif</h2>
+            <FloorSketch property={property} />
+          </section>
+
+          {property.listing !== "rent" && <MortgageCalculator price={property.price} />}
         </div>
 
         {/* Sidebar */}
@@ -161,11 +179,21 @@ export function PropertyDetail({ property }: { property: Property }) {
             <div className="mt-5 grid gap-2.5">
               <Button
                 onClick={() => setVisitOpen(true)}
-                className="w-full rounded-full bg-gold text-ink hover:bg-gold/90"
+                className="w-full rounded-full bg-[#111111] text-white hover:bg-rausch"
                 size="lg"
               >
-                Demander une visite
+                Planifier une visite
               </Button>
+              <a href={whatsappHref(waText)} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="w-full rounded-full" size="lg">
+                  <MessageCircle className="mr-2 size-4" /> WhatsApp
+                </Button>
+              </a>
+              <a href={telHref()}>
+                <Button variant="outline" className="w-full rounded-full" size="lg">
+                  <Phone className="mr-2 size-4" /> Appeler
+                </Button>
+              </a>
               <Button
                 onClick={() => setContactOpen(true)}
                 variant="outline"
@@ -220,7 +248,7 @@ export function PropertyDetail({ property }: { property: Property }) {
                 className="flex w-full items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
               >
                 <Phone className="size-4 text-gold" />
-                {showPhone ? (seller?.phone ?? "+212 5 22 00 00 00") : "Afficher le téléphone"}
+                {showPhone ? phone : "Afficher le téléphone"}
               </button>
               <Button
                 onClick={() => setContactOpen(true)}
@@ -240,8 +268,8 @@ export function PropertyDetail({ property }: { property: Property }) {
                 <Factory className="size-4 text-gold" /> Performance énergétique
               </h3>
               <div className="mt-4 space-y-3">
-                <EnergyBar label="Consommation énergétique" level="B" color="bg-green-500" />
-                <EnergyBar label="Émissions de gaz à effet de serre" level="C" color="bg-yellow-500" />
+                <EnergyBar label="Consommation énergétique" level="B" color="bg-gold" />
+                <EnergyBar label="Émissions de gaz à effet de serre" level="C" color="bg-gold-strong" />
               </div>
               <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
                 <Flame className="size-3.5" />
@@ -268,6 +296,17 @@ export function PropertyDetail({ property }: { property: Property }) {
         property={property}
       />
 
+      {similar.length > 0 && (
+        <section className="mt-16">
+          <h2 className="font-display text-2xl font-semibold">Biens similaires</h2>
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {similar.map((item) => (
+              <PropertyCard key={item.id} property={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Mobile persistent action bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-border/70 bg-background/95 px-4 py-3 backdrop-blur-xl lg:hidden">
         <div className="min-w-0">
@@ -281,7 +320,7 @@ export function PropertyDetail({ property }: { property: Property }) {
         <Button
           onClick={() => setVisitOpen(true)}
           size="lg"
-          className="shrink-0 rounded-full bg-gold px-6 text-ink hover:bg-gold/90"
+          className="shrink-0 rounded-full bg-gold px-6 text-white hover:bg-gold/90"
         >
           Demander une visite
         </Button>
@@ -304,6 +343,39 @@ function StatCard({
       <Icon className="size-5 text-gold-strong" />
       <p className="tnum mt-2 font-display text-lg font-semibold">{value}</p>
       <p className="text-xs text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
+function FloorSketch({ property }: { property: Property }) {
+  const rooms = showsRooms(property) ? Math.max(property.bedrooms, 1) : 0;
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-faint p-4">
+      <svg viewBox="0 0 320 180" className="h-44 w-full" role="img" aria-label={`Schéma de ${property.title}`}>
+        <rect x="8" y="8" width="304" height="164" rx="8" fill="none" stroke="currentColor" className="text-hof" strokeWidth="2" />
+        {rooms === 0 ? (
+          <text x="160" y="96" textAnchor="middle" className="fill-hof text-[14px]">
+            {property.surface} m²
+          </text>
+        ) : (
+          Array.from({ length: Math.min(rooms, 4) }).map((_, i) => (
+            <rect
+              key={i}
+              x={20 + (i % 2) * 145}
+              y={20 + Math.floor(i / 2) * 75}
+              width="130"
+              height="62"
+              rx="4"
+              fill="none"
+              stroke="currentColor"
+              className="text-foggy"
+            />
+          ))
+        )}
+      </svg>
+      <p className="text-xs text-muted-foreground">
+        Schéma indicatif, {property.surface} m². Le plan coté est remis avant la visite.
+      </p>
     </div>
   );
 }

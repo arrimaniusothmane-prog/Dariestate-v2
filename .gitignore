@@ -42,3 +42,4 @@ next-env.d.ts
 
 # server-side data store (seeded automatically at runtime)
 /data/
+screenshots/

@@ -27,7 +27,7 @@ export function DemandesNavBadge() {
   if (count === 0) return null;
 
   return (
-    <span className="ml-auto rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-ink">
+    <span className="ml-auto rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-white">
       {count}
     </span>
   );

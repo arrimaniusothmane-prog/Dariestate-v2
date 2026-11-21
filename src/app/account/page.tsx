@@ -137,7 +137,7 @@ export default function AccountPage() {
               return (
                 <Link key={card.href} href={card.href} className="group">
                   <div className="flex h-full flex-col rounded-2xl border border-border/60 bg-card p-6 transition-colors duration-300 hover:border-gold/40 hover:shadow-md">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-sand text-gold-strong transition-colors group-hover:bg-gold group-hover:text-ink">
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-sand text-gold-strong transition-colors group-hover:bg-gold group-hover:text-white">
                       <Icon className="size-6" />
                     </div>
                     <h3 className="mt-4 font-display text-lg font-semibold">
@@ -160,7 +160,7 @@ export default function AccountPage() {
               className="group h-full"
             >
               <div className="flex h-full flex-col rounded-2xl border border-border/60 bg-card p-6 transition-colors duration-300 hover:border-gold/40 hover:shadow-md">
-                <div className="flex size-12 items-center justify-center rounded-xl bg-sand text-gold-strong transition-colors group-hover:bg-gold group-hover:text-ink">
+                <div className="flex size-12 items-center justify-center rounded-xl bg-sand text-gold-strong transition-colors group-hover:bg-gold group-hover:text-white">
                   <UserRoundCog className="size-6" />
                 </div>
                 <h3 className="mt-4 font-display text-lg font-semibold">

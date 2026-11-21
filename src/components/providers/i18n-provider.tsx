@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import type { Locale } from "@/lib/i18n";
 import { translations } from "@/lib/i18n";
 
@@ -12,8 +12,35 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
+const LOCALE_KEY = "darestimate-locale";
+
+function readLocale(): Locale {
+  if (typeof window === "undefined") return "fr";
+  try {
+    const stored = localStorage.getItem(LOCALE_KEY);
+    if (stored === "fr" || stored === "ar" || stored === "en") return stored;
+  } catch {
+    /* ignore */
+  }
+  return "fr";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("fr");
+  const [locale, setLocaleState] = useState<Locale>("fr");
+
+  const setLocale = useCallback((next: Locale) => {
+    setLocaleState(next);
+    try {
+      localStorage.setItem(LOCALE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const stored = readLocale();
+    if (stored !== "fr") setLocaleState(stored);
+  }, []);
 
   const t = useCallback(
     (key: string) => {

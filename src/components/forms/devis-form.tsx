@@ -13,6 +13,7 @@ import {
   Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { agency, telHref } from "@/lib/agency";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -123,7 +124,8 @@ function DevisFormInner() {
         </p>
         <div className="mt-6 flex items-center justify-center gap-3 text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <Phone className="size-4 text-gold" /> +212 5 22 00 00 00
+            <Phone className="size-4 text-gold" />{" "}
+            <a href={telHref()}>{agency.phoneDisplay}</a>
           </span>
           <span className="flex items-center gap-1.5">
             <Mail className="size-4 text-gold" /> contact@darestimate.ma

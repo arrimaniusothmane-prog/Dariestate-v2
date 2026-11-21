@@ -363,7 +363,7 @@ export function ProfileSettings() {
               <Button
                 type="submit"
                 disabled={saving || !user}
-                className="w-full rounded-full bg-gold text-ink hover:bg-gold/90"
+                className="w-full rounded-full bg-gold text-white hover:bg-gold/90"
               >
                 {saving ? (
                   <>

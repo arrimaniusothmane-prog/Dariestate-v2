@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, MessageCircleQuestion, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { agency } from "@/lib/agency";
 import { Input } from "@/components/ui/input";
 import {
   Accordion,
@@ -43,7 +44,7 @@ const faqs = [
   },
   {
     q: "Comment contacter le support DarEstate ?",
-    a: "Notre équipe est joignable par téléphone au +212 5 22 00 00 00 du lundi au vendredi de 9h à 19h, par email à contact@darestimate.ma, ou via le formulaire de la page contact. Nous répondons généralement sous 24 heures ouvrées.",
+    a: `Notre équipe est joignable par téléphone au ${agency.phoneDisplay} du lundi au vendredi de 9h à 19h, par email à ${agency.email}, ou via le formulaire de la page contact. Nous répondons généralement sous 24 heures ouvrées.`,
   },
 ];
 

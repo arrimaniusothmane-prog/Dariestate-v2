@@ -28,7 +28,7 @@ export function FavoritesContent() {
       {/* Header */}
       <section className="bg-sand/50 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
+          <span className="text-sm font-semibold uppercase tracking-widest text-foggy">
             Votre sélection
           </span>
           <h1 className="mt-3 font-display text-4xl font-semibold">

@@ -368,7 +368,7 @@ export default function SellerAddPropertyPage() {
           email: "",
           phone: "",
           data: {
-            category: draft.category,
+            category: draft.category ?? "",
             city: draft.city,
             price: draft.price,
             surface: draft.surface,
@@ -958,7 +958,7 @@ export default function SellerAddPropertyPage() {
             <Button
               type="button"
               disabled={!canProceed || publishing}
-              className="rounded-full bg-gold text-ink hover:bg-gold/90"
+              className="rounded-full bg-gold text-white hover:bg-gold/90"
               onClick={handlePublish}
             >
               {publishing ? <Loader2 className="size-4 animate-spin" /> : <BadgeCheck className="size-4" />}
